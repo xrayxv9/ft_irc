@@ -9,7 +9,7 @@
 #include <netdb.h>
 #include <netinet/in.h>
 #include <sys/select.h>
-#include "Server.hpp"
+#include "server/Server.hpp"
 
 
 int main(int argc, char **argv)

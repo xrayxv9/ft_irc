@@ -53,7 +53,6 @@ void Server::run()
 	sockaddr_in client;
 	socklen_t clientSize = sizeof(client);
 	int clientFd;
-	char *buffer;
 
 	std::string welcomeMessage = "Welcome to the brand new onlyFans Server\n";
 
