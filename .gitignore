@@ -1,0 +1,4 @@
+*.o
+*/*.o
+ircserv
+compile_commands.json
