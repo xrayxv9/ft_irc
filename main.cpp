@@ -19,7 +19,7 @@ int main(int argc, char **argv)
 		std::cerr << "The port you have given is incorrect" << std::endl;
 		return 1;
 	}
-	port = atoi(portPreConvert.c_str());
+	port = std::atoi(portPreConvert.c_str());
 	if (port > 65535)
 	{
 		std::cerr << "The port you have given is incorrect" << std::endl;
