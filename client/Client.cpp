@@ -1,9 +1,11 @@
 #include "Client.hpp"
 #include <sstream>
 
-Client::Client( int fd, int index, const Server &server): _server(server)
+Client::Client( int fd, int index, Server &server): _server(server)
 {
+	(void)_server;
 	std::ostringstream oss;
+	std::cout << index << std::endl;
 	oss << index;
 	std::string str = oss.str(); 
 

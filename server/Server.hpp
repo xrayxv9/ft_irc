@@ -4,6 +4,10 @@
 #include <netinet/in.h>
 #include <iostream>
 #include <unistd.h>
+// #include <Client.hpp>
+#include "../client/Client.hpp"
+
+class Client;
 
 class Server
 {
@@ -13,6 +17,7 @@ class Server
 		int	getFd();
 		std::map<std::string, int> getChannels();
 		int	getStatus();
+		int getIndexClient();
 		void run();
 
 	private:
@@ -20,5 +25,6 @@ class Server
 		int socketFd;
 		sockaddr_in hint;
 		std::map<std::string, int> channels;
+		std::map<int, Client *> clients;
 		
 };

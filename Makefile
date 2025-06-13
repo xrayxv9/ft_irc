@@ -1,7 +1,7 @@
 NAME = ircserv
 
 CC = c++
-FLAGS = -Wall -Werror -Wextra -std=c++98 -I server/ -I commands/
+FLAGS = -Wall -Werror -Wextra -std=c++98 -I server/ -I commands/ -I client/
 
 GREEN = \033[32m
 RED = \033[31m
@@ -9,7 +9,7 @@ YELLOW = \033[33m
 BLUE = \033[38;2;15;101;214m
 RESET = \033[0m
 
-SRC = main.cpp server/Server.cpp commands/Command.cpp
+SRC = main.cpp server/Server.cpp commands/Command.cpp client/Client.cpp
 
 OBJS_SRC = $(SRC:.cpp=.o)
 

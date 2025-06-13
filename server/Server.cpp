@@ -48,11 +48,20 @@ Server::~Server()
 	std::cout << "server closed" << std::endl;
 }
 
+int Server::getIndexClient()
+{
+	int i = 0;
+	for (std::map<int, Client *>::iterator it = clients.begin(); it != clients.end(); it++)
+		i++;
+	return (i);
+}
+
 void Server::run()
 {
 	sockaddr_in client;
 	socklen_t clientSize = sizeof(client);
 	int clientFd;
+	Client *clientClass;
 
 	std::string welcomeMessage = "Welcome to the brand new onlyFans Server\n";
 
@@ -60,5 +69,7 @@ void Server::run()
 	{
 		clientFd = accept(this->socketFd, (sockaddr *)&client, &clientSize);
 		send(clientFd, welcomeMessage.c_str(), welcomeMessage.length(), 0);
+		clientClass = new Client(clientFd, getIndexClient(), *this);
+		clients[getIndexClient()] = clientClass;
 	}
 }

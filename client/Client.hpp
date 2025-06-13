@@ -15,11 +15,11 @@ class Server;
 class Client
 {
 	public:
-		Client( int fd, int index, const Server &server);
+		Client( int fd, int index, Server &server);
 		~Client();
 
 	private:
-		const Server _server;
+		Server &_server;
 		int _clientFd;
 		rank _rank;
 		std::string _nickName;
