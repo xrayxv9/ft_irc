@@ -4,8 +4,24 @@
 #include <netinet/in.h>
 #include <iostream>
 #include <unistd.h>
-// #include <Client.hpp>
+#include <asm-generic/socket.h>
+#include <csignal>
+#include <iostream>
+#include <netinet/in.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <unistd.h>
+#include <arpa/inet.h>
+#include <stdlib.h>
+#include <netdb.h>
+#include <netinet/in.h>
+#include <sys/select.h>
+#include <vector>
+#include <poll.h>
 #include "../client/Client.hpp"
+// #include <Client.hpp>
+
+extern bool g_running;
 
 class Client;
 
@@ -21,10 +37,11 @@ class Server
 		void run();
 
 	private:
+		void createFd( int fd );
 		int success;
 		int socketFd;
 		sockaddr_in hint;
 		std::map<std::string, int> channels;
 		std::map<int, Client *> clients;
-		
+		std::vector<struct pollfd> fds; 
 };
