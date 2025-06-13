@@ -1,16 +1,14 @@
-#include <asm-generic/socket.h>
-#include <iostream>
-#include <netinet/in.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <unistd.h>
-#include <arpa/inet.h>
-#include <stdlib.h>
-#include <netdb.h>
-#include <netinet/in.h>
-#include <sys/select.h>
+
 #include <Server.hpp>
 
+bool g_running = true;
+
+
+void handle_sigint( int sig )
+{
+	(void)sig;
+	g_running = false;
+}
 
 int main(int argc, char **argv)
 {
@@ -36,6 +34,7 @@ int main(int argc, char **argv)
 		std::cerr << "The port you have given is incorrect" << std::endl;
 		return 1;
 	}
+	std::signal(SIGINT, handle_sigint);
 	Server *serv = new Server(port);
 	if (serv->getStatus() == 0)
 	{
