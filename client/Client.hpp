@@ -2,6 +2,7 @@
 
 #include <Server.hpp>
 #include <Join.hpp>
+#include "../channel/Channel.hpp"
 
 enum rank
 {
@@ -11,6 +12,7 @@ enum rank
 };
 
 class Server;
+class Client;
 
 class Client
 {
@@ -20,6 +22,7 @@ class Client
 		Server &getServer();
 
 	private:
+		Channel _currentChannel;
 		Server &_server;
 		int _clientFd;
 		rank _rank;

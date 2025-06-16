@@ -21,3 +21,8 @@ Client::~Client()
 	send(this->_clientFd, message.c_str(), message.length(), 0);
 	close (this->_clientFd);
 }
+
+Server &Client::getServer()
+{
+	return _server;
+}
