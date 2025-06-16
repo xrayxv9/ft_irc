@@ -73,6 +73,7 @@ Server::~Server()
 	}
 
 	close(this->socketFd);
+	delete this->commands["join"];
 	std::cout << "server closed" << std::endl;
 }
 
