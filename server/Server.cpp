@@ -1,8 +1,8 @@
 #include "Server.hpp"
+#include <Join.hpp>
 #include <sys/poll.h>
 #include <sys/socket.h>
 #include <vector>
-
 
 Server::Server( int port )
 {
@@ -31,6 +31,9 @@ Server::Server( int port )
 		std::cerr << "can't listen" << std::endl;
 		return ;
 	}
+
+	//Registering commands
+	this->commands["join"] = new Join();
 	success = 1;
 }
 
@@ -112,7 +115,12 @@ void Server::run()
 				{
 					result = recv(it->fd, reading, sizeof(reading), 0);
 					if (result)
-						std::cout << "recv : " << reading << std::endl;
+					{
+						if (std::string(reading).rfind("JOIN") == 0)
+							this->commands["join"]->execute(reading, *clientClass);
+						else
+							std::cout << "Reading is: " << reading << std::endl;
+					}
 					else
 					{
 						std::cout << "left" << std::endl;

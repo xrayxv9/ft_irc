@@ -6,8 +6,10 @@ Join::Join(): Command("Join", "Join a channel")
 
 }
 
-int Join::execute(const std::string &command) const
+int Join::execute(const std::string &command, const Client &cli) const
 {
-	std::cout << "Hello world" << std::endl;
+	(void)cli;
+	(void)command;
+	std::cout << "Hello worldd"  << std::endl;
 	return 1;
 }

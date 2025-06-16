@@ -19,11 +19,11 @@
 #include <vector>
 #include <poll.h>
 #include "../client/Client.hpp"
-// #include <Client.hpp>
 
 extern bool g_running;
 
 class Client;
+class Command;
 
 class Server
 {
@@ -43,5 +43,6 @@ class Server
 		sockaddr_in hint;
 		std::map<std::string, int> channels;
 		std::map<int, Client *> clients;
-		std::vector<struct pollfd> fds; 
+		std::vector<struct pollfd> fds;
+		std::map<std::string, Command *> commands;
 };

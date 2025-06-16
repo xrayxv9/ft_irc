@@ -2,6 +2,8 @@
 
 #include <string>
 
+class Client;
+
 class Command
 {
 	public:
@@ -10,7 +12,7 @@ class Command
 		const std::string &getName() const;
 		const std::string &getDescription() const;
 
-		virtual int execute(const std::string &command) const = 0;
+		virtual int execute(const std::string &command, const Client &cli) const = 0;
 
 	private:
 		std::string name;
