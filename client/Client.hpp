@@ -20,9 +20,10 @@ class Client
 		Client( int fd, int index, Server &server);
 		~Client();
 		Server &getServer();
-
+		int getFd() const;
+		Channel *getCurrentChannel();
 	private:
-		Channel _currentChannel;
+		Channel *_currentChannel;
 		Server &_server;
 		int _clientFd;
 		rank _rank;

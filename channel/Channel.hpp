@@ -8,9 +8,13 @@ class Client;
 class Channel
 {
 	public :
-		Channel();
-		void send();
+		Channel(std::string);
+		Channel(std::string, Client &);
+		~Channel();
+		void sendMessage(const std::string &);
 		void recv();
+
 	private :
+		std::string _channelName;
 		std::vector<Client> _clientList;
 };

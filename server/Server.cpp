@@ -57,22 +57,21 @@ int Server::getFd()
 	return this->socketFd;
 }
 
-std::map<std::string, int> Server::getChannels()
+std::map<std::string, Channel> Server::getChannels()
 {
 	return this->channels;
 }
 
 Server::~Server() 
 {
-	for (std::map<std::string, int>::iterator it = channels.begin(); it != channels.end(); it++)
-		close(it->second);
-
 	for (std::map<int, Client *>::iterator it = clients.begin(); it != clients.end(); it++)
 	{
+		delete it->second->getCurrentChannel();
 		delete it->second;
 	}
+
 	close(this->socketFd);
-	for (std::map<std::string, Command *>::iterator it = this->commands.begin(); it != this->commands.end() ; it ++)
+	for (std::map<std::string, Command *>::iterator it = commands.begin(); it != commands.end(); it++)
 		delete it->second;
 	std::cout << "server closed" << std::endl;
 }
@@ -103,6 +102,7 @@ void Server::run()
 		{
 			clientFd = accept(this->socketFd, (sockaddr *)&client, &clientSize);
 			send(clientFd, welcomeMessage.c_str(), welcomeMessage.length(), 0);
+			std::cout << "New user with fd: " << clientFd << std::endl;
 			clientClass = new Client(clientFd, getIndexClient(), *this);
 			createFd( clientFd );
 			clients[getIndexClient()] = clientClass;
@@ -131,6 +131,8 @@ void Server::run()
 					}
 					it->revents = 0;
 				}
+				else if (it->revents & POLL_MSG)
+					std::cout << "intruction pas claire: j'ai mangé mon caca" << std::endl;
 			}
 		}
 	}

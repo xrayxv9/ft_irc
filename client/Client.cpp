@@ -1,15 +1,14 @@
 #include "Client.hpp"
 #include <sstream>
 
-Client::Client( int fd, int index, Server &server): _server(server)
+Client::Client( int fd, int index, Server &server): _server(server) ,_clientFd(fd)
 {
-	(void)_server;
+	 _currentChannel = new Channel("default", *this);
 	std::ostringstream oss;
 	std::cout << index << std::endl;
 	oss << index;
 	std::string str = oss.str(); 
 
-	this->_clientFd = fd;
 	this->_nickName = "default" + str;
 	this->_rank = USER;
 }
@@ -20,6 +19,16 @@ Client::~Client()
 
 	send(this->_clientFd, message.c_str(), message.length(), 0);
 	close (this->_clientFd);
+}
+
+int Client::getFd() const
+{
+	return this->_clientFd;
+}
+
+Channel *Client::getCurrentChannel()
+{
+	return this->_currentChannel;
 }
 
 Server &Client::getServer()
