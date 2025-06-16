@@ -71,9 +71,9 @@ Server::~Server()
 	{
 		delete it->second;
 	}
-
 	close(this->socketFd);
-	delete this->commands["join"];
+	for (std::map<std::string, Command *>::iterator it = this->commands.begin(); it != this->commands.end() ; it ++)
+		delete it->second;
 	std::cout << "server closed" << std::endl;
 }
 
