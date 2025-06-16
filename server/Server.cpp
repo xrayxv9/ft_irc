@@ -1,5 +1,7 @@
 #include "Server.hpp"
 #include <Join.hpp>
+#include <sstream>
+#include <string>
 #include <sys/poll.h>
 #include <sys/socket.h>
 #include <vector>
@@ -117,10 +119,14 @@ void Server::run()
 					result = recv(it->fd, reading, sizeof(reading), 0);
 					if (result)
 					{
-						if (std::string(reading).rfind("JOIN") == 0)
+						std::string toComp;
+						std::istringstream f(reading);
+						std::getline(f, toComp, ' '); 
+						if (toComp == "JOIN")
 							this->commands["join"]->execute(reading, *clientClass);
-						else
-							std::cout << "Reading is: " << reading << std::endl;
+						// else
+						std::cout << "Reading is: " << reading << " end" << std::endl;
+						std::cout << "Find is is: " << std::string(reading).rfind("JOIN") << " end" << std::endl;
 					}
 					else
 					{
