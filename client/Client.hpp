@@ -17,6 +17,7 @@ class Client
 	public:
 		Client( int fd, int index, Server &server);
 		~Client();
+		Server &getServer();
 
 	private:
 		Server &_server;
