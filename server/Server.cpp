@@ -101,9 +101,9 @@ void Server::run()
 		if (fds.data()->revents & POLLIN)
 		{
 			clientFd = accept(this->socketFd, (sockaddr *)&client, &clientSize);
-			send(clientFd, welcomeMessage.c_str(), welcomeMessage.length(), 0);
-			std::cout << "New user with fd: " << clientFd << std::endl;
 			clientClass = new Client(clientFd, getIndexClient(), *this);
+			send(clientClass->getFd(), welcomeMessage.c_str(), welcomeMessage.length(), 0);
+			std::cout << "New user with fd: " << clientFd << std::endl;
 			createFd( clientFd );
 			clients[getIndexClient()] = clientClass;
 			fds.data()->revents = 0;

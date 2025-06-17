@@ -2,6 +2,7 @@
 
 #include <Server.hpp>
 #include <Join.hpp>
+#include <sstream>
 #include "../channel/Channel.hpp"
 
 enum rank
@@ -22,6 +23,8 @@ class Client
 		Server &getServer();
 		int getFd() const;
 		Channel *getCurrentChannel();
+		void joinChannel(const std::string &);
+		void sendMessage(std::ostringstream &);
 	private:
 		Channel *_currentChannel;
 		Server &_server;
