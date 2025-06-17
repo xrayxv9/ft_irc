@@ -7,6 +7,7 @@
 #include <asm-generic/socket.h>
 #include <csignal>
 #include <iostream>
+#include <fcntl.h>
 #include <netinet/in.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -36,6 +37,7 @@ class Server
 		std::map<std::string, Channel> getChannels();
 		int	getStatus();
 		int getIndexClient();
+		std::map<int, Client *> getClients();
 		void run();
 
 	private:

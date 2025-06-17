@@ -52,3 +52,8 @@ Server &Client::getServer()
 {
 	return _server;
 }
+
+std::string Client::getName() const
+{
+	return _nickName;
+}
