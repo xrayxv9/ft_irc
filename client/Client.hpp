@@ -25,7 +25,9 @@ class Client
 		Channel *getCurrentChannel();
 		void joinChannel(const std::string &);
 		void sendMessage(std::ostringstream &);
+		std::string getName() const;
 		void sendMessage(std::string);
+
 	private:
 		Channel *_currentChannel;
 		Server &_server;

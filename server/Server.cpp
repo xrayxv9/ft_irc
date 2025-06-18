@@ -19,7 +19,6 @@ Server::Server( int port )
 	if (bind(socketFd, (sockaddr *)&hint, sizeof(hint)) == -1)
 	{
 		this->success = 0;
-		close(socketFd);
 		std::cerr << "Couldn't bind the server" << std::endl;
 		return ;
 	}
@@ -27,10 +26,11 @@ Server::Server( int port )
 	if (listen(socketFd, SOMAXCONN) == -1)
 	{
 		this->success = 0;
-		close(socketFd);
 		std::cerr << "can't listen" << std::endl;
 		return ;
 	}
+	//fcntl
+	if (fcntl(this->socketFd, O_NONBLOCK))
 
 	//Registering commands
 	this->commands["join"] = new Join();
@@ -149,4 +149,9 @@ void Server::run()
 			}
 		}
 	}
+}
+
+std::map<int, Client *> &Server::getClients()
+{
+	return clients;
 }
