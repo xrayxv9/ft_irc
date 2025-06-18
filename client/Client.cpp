@@ -1,5 +1,5 @@
 #include "Client.hpp"
-#include "channel/Channel.hpp"
+#include "../channel/Channel.hpp"
 #include <sstream>
 
 Client::Client( int fd, int index, Server &server, std::string &realName):
