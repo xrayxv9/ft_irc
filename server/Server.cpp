@@ -138,7 +138,7 @@ void Server::run()
 	}
 }
 
-std::map<int, Client *> Server::getClients()
+std::map<int, Client *> &Server::getClients()
 {
 	return clients;
 }

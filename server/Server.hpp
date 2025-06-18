@@ -37,7 +37,7 @@ class Server
 		std::map<std::string, Channel> getChannels();
 		int	getStatus();
 		int getIndexClient();
-		std::map<int, Client *> getClients();
+		std::map<int, Client *> &getClients();
 		void run();
 
 	private:
