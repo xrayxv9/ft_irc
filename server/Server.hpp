@@ -34,7 +34,7 @@ class Server
 		Server( int port );
 		~Server();
 		int	getFd();
-		std::map<std::string, Channel> getChannels();
+		std::map<std::string, Channel *> getChannels();
 		int	getStatus();
 		int getIndexClient();
 		std::map<int, Client *> &getClients();
@@ -45,8 +45,8 @@ class Server
 		int success;
 		int socketFd;
 		sockaddr_in hint;
-		std::map<std::string, Channel> channels;
+		std::map<std::string, Channel *> channels;
 		std::map<int, Client *> clients;
 		std::vector<struct pollfd> fds;
-		std::map<std::string, Command *> commands;
+		std::map<std::string, Command *> commands; 
 };
