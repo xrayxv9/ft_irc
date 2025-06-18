@@ -18,13 +18,14 @@ class Client;
 class Client
 {
 	public:
-		Client( int fd, int index, Server &server);
+		Client( int fd, int index, Server &server, std::string &realName);
 		~Client();
 		Server &getServer();
 		int getFd() const;
 		Channel *getCurrentChannel();
 		void joinChannel(const std::string &);
 		void sendMessage(std::ostringstream &);
+		void sendMessage(std::string);
 	private:
 		Channel *_currentChannel;
 		Server &_server;
