@@ -57,22 +57,21 @@ int Server::getFd()
 	return this->socketFd;
 }
 
-std::map<std::string, int> Server::getChannels()
+std::map<std::string, Channel *> Server::getChannels()
 {
 	return this->channels;
 }
 
 Server::~Server() 
 {
-	for (std::map<std::string, int>::iterator it = channels.begin(); it != channels.end(); it++)
-		close(it->second);
-
 	for (std::map<int, Client *>::iterator it = clients.begin(); it != clients.end(); it++)
 	{
+		delete it->second->getCurrentChannel();
 		delete it->second;
 	}
+
 	close(this->socketFd);
-	for (std::map<std::string, Command *>::iterator it = this->commands.begin(); it != this->commands.end() ; it ++)
+	for (std::map<std::string, Command *>::iterator it = commands.begin(); it != commands.end(); it++)
 		delete it->second;
 	std::cout << "server closed" << std::endl;
 }
@@ -83,6 +82,18 @@ int Server::getIndexClient()
 	for (std::map<int, Client *>::iterator it = clients.begin(); it != clients.end(); it++)
 		i++;
 	return (i);
+}
+
+std::string getArg(std::string input)
+{
+	int where = input.find("USER ");
+	std::cout << "Where is " << where << ". Input is " << input << std::endl;
+	std::string res = "";
+	where += 5;
+	for(; input[where] != ' '; where ++)
+		res += input[where];
+	std::cout << "Nickname is: " << res << std::endl;
+	return res;
 }
 
 void Server::run()
@@ -102,8 +113,11 @@ void Server::run()
 		if (fds.data()->revents & POLLIN)
 		{
 			clientFd = accept(this->socketFd, (sockaddr *)&client, &clientSize);
-			send(clientFd, welcomeMessage.c_str(), welcomeMessage.length(), 0);
-			clientClass = new Client(clientFd, getIndexClient(), *this);
+			recv(clientFd, reading, sizeof(reading), 0);
+			std::string username = getArg(std::string(reading));
+			clientClass = new Client(clientFd, getIndexClient(), *this, username);
+			send(clientClass->getFd(), welcomeMessage.c_str(), welcomeMessage.length(), 0);
+			std::cout << "New user with fd: " << clientFd << std::endl;
 			createFd( clientFd );
 			clients[getIndexClient()] = clientClass;
 			fds.data()->revents = 0;
@@ -117,10 +131,11 @@ void Server::run()
 					result = recv(it->fd, reading, sizeof(reading), 0);
 					if (result)
 					{
-						if (std::string(reading).rfind("JOIN") == 0)
+						if (std::string(reading).rfind("JOIN ") == 0)
 							this->commands["join"]->execute(reading, *clientClass);
 						else
-							std::cout << "Reading is: " << reading << std::endl;
+							std::cout << "Not join command" << std::endl;
+						std::cout << "Reading is: " << reading << std::endl;
 					}
 					else
 					{
