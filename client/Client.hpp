@@ -23,7 +23,7 @@ class Client
 		~Client();
 		Server &getServer();
 		int getFd() const;
-		Channel *getCurrentChannel();
+		std::map<std::string, Channel *> &getChannels();
 		void joinChannel(const std::string &);
 		void sendMessage(std::ostringstream &);
 		std::string getName() const;
