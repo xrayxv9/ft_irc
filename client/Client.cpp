@@ -7,13 +7,12 @@ Client::Client( int fd, int index, Server &server, std::string &realName):
 	_clientFd(fd),
 	_nickName(realName)
 {
-	_currentChannel = new Channel("default", *this);
+	
 	std::ostringstream oss;
 	std::cout << index << std::endl;
 	oss << index;
 	std::string str = oss.str(); 
 
-	// this->_nickName = "default" + str;
 	this->_rank = USER;
 }
 
@@ -30,9 +29,9 @@ int Client::getFd() const
 	return this->_clientFd;
 }
 
-Channel *Client::getCurrentChannel()
+std::map<std::string, Channel *> &Client::getChannels()
 {
-	return this->_currentChannel;
+	return this->_channels;
 }
 
 void Client::sendMessage(std::ostringstream &message)
@@ -60,6 +59,7 @@ void Client::joinChannel(const std::string &channelName)
 		channel = new Channel(channelName);
 		this->_server.getChannels()[channelName] = channel;
 	}
+	this->_channels[channelName] = channel;
 }
 
 Server &Client::getServer()

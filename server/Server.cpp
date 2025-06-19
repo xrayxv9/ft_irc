@@ -67,7 +67,6 @@ Server::~Server()
 {
 	for (std::map<int, Client *>::iterator it = clients.begin(); it != clients.end(); it++)
 	{
-		delete it->second->getCurrentChannel();
 		delete it->second;
 	}
 
@@ -88,8 +87,9 @@ int Server::getIndexClient()
 std::string getArg(std::string input)
 {
 	int where = input.find("USER ");
-	std::cout << "Where is " << where << ". Input is " << input << std::endl;
 	std::string res = "";
+	if (where == -1)
+		return std::string("");
 	where += 5;
 	for(; input[where] != ' '; where ++)
 		res += input[where];
@@ -116,11 +116,17 @@ void Server::run()
 			clientFd = accept(this->socketFd, (sockaddr *)&client, &clientSize);
 			recv(clientFd, reading, sizeof(reading), 0);
 			std::string username = getArg(std::string(reading));
+			if (username.empty())
+			{
+				close(clientFd);
+				std::cout << "Invalid session tried to connect" << std::endl;
+				continue;
+			}
 			clientClass = new Client(clientFd, getIndexClient(), *this, username);
 			send(clientClass->getFd(), welcomeMessage.c_str(), welcomeMessage.length(), 0);
-			std::cout << "New user with fd: " << clientFd << std::endl;
+			std::cout << "New user with fd: " << clientFd << " and username: " << clientClass->getName() << std::endl;
 			createFd( clientFd );
-			clients[getIndexClient()] = clientClass;
+			clients[clientFd] = clientClass;
 			fds.data()->revents = 0;
 		}
 		else

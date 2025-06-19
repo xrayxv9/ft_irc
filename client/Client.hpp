@@ -2,6 +2,7 @@
 
 #include <Server.hpp>
 #include <Join.hpp>
+#include <map>
 #include <sstream>
 #include "../channel/Channel.hpp"
 
@@ -22,14 +23,14 @@ class Client
 		~Client();
 		Server &getServer();
 		int getFd() const;
-		Channel *getCurrentChannel();
+		std::map<std::string, Channel *> &getChannels();
 		void joinChannel(const std::string &);
 		void sendMessage(std::ostringstream &);
 		std::string getName() const;
 		void sendMessage(std::string);
 
 	private:
-		Channel *_currentChannel;
+		std::map<std::string, Channel *> _channels;
 		Server &_server;
 		int _clientFd;
 		rank _rank;
