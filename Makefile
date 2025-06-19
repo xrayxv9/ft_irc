@@ -9,7 +9,11 @@ YELLOW = \033[33m
 BLUE = \033[38;2;15;101;214m
 RESET = \033[0m
 
-SRC = main.cpp server/Server.cpp commands/Command.cpp commands/Join.cpp client/Client.cpp channel/Channel.cpp commands/Nick.cpp
+SRC = main.cpp server/Server.cpp client/Client.cpp channel/Channel.cpp \
+	commands/Nick.cpp \
+	commands/Command.cpp \
+	commands/Join.cpp \
+	commands/Password.cpp
 
 OBJS_SRC = $(SRC:.cpp=.o)
 

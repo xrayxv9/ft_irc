@@ -71,3 +71,14 @@ std::string Client::getName() const
 {
 	return _nickName;
 }
+
+int Client::isRegistered() const
+{
+	return _isRegistered;
+}
+
+void Client::logIn()
+{
+	_isRegistered = 1;
+}
+

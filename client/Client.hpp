@@ -28,6 +28,8 @@ class Client
 		void sendMessage(std::ostringstream &);
 		std::string getName() const;
 		void sendMessage(std::string);
+		int	isRegistered() const;
+		void logIn();
 
 	private:
 		std::map<std::string, Channel *> _channels;
@@ -35,4 +37,5 @@ class Client
 		int _clientFd;
 		rank _rank;
 		std::string _nickName;
+		int _isRegistered;
 };

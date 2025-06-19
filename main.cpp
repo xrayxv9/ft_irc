@@ -35,7 +35,7 @@ int main(int argc, char **argv)
 		return 1;
 	}
 	std::signal(SIGINT, handle_sigint);
-	Server *serv = new Server(port);
+	Server *serv = new Server(port, passwd);
 	if (serv->getStatus() == 0)
 	{
 		delete serv;

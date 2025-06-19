@@ -4,8 +4,11 @@
 #include <sys/socket.h>
 #include <vector>
 
-Server::Server( int port )
+Server::Server( int port , std::string passwd )
 {
+	// save password
+	
+	_passwd = passwd;
 	// server socket handle
 	this->socketFd = socket(AF_INET, SOCK_STREAM, 0);
 	hint.sin_family = AF_INET;
