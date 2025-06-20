@@ -13,6 +13,8 @@ class Channel
 		~Channel();
 		void sendMessage(const std::string &);
 		void recv();
+		std::vector<Client> &getClients();
+		std::string getName();	
 
 	private :
 		std::string _channelName;
