@@ -19,7 +19,7 @@ class Client;
 class Client
 {
 	public:
-		Client( int fd, int index, Server &server, std::string &realName);
+		Client( int fd, int index, Server &server, std::string &userName, std::string &nickName);
 		~Client();
 		Server &getServer();
 		int getFd() const;
@@ -28,6 +28,7 @@ class Client
 		void sendMessage(std::ostringstream &);
 		std::string getName() const;
 		void sendMessage(std::string);
+		std::string generateMask();
 
 	private:
 		std::map<std::string, Channel *> _channels;
@@ -35,4 +36,5 @@ class Client
 		int _clientFd;
 		rank _rank;
 		std::string _nickName;
+		std::string _userName;
 };
