@@ -83,7 +83,13 @@ Server &Client::getServer()
 	return _server;
 }
 
-std::string Client::getName() const
+std::string Client::getNickName() const
 {
 	return _nickName;
+}
+
+
+std::string Client::getUserName() const
+{
+	return this->_userName;
 }

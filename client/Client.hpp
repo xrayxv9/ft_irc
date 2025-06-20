@@ -26,7 +26,8 @@ class Client
 		std::map<std::string, Channel *> &getChannels();
 		void joinChannel(const std::string &);
 		void sendMessage(std::ostringstream &);
-		std::string getName() const;
+		std::string getUserName() const;
+		std::string getNickName() const;
 		void sendMessage(std::string);
 		std::string generateMask();
 
