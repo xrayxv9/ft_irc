@@ -2,10 +2,11 @@
 #include "channel/Channel.hpp"
 #include <sstream>
 
-Client::Client( int fd, int index, Server &server, std::string &realName):
+Client::Client( int fd, int index, Server &server, std::string &userName, std::string &nickName):
 	_server(server),
 	_clientFd(fd),
-	_nickName(realName)
+	_nickName(nickName),
+	_userName(userName)
 {
 	
 	std::ostringstream oss;
@@ -22,6 +23,18 @@ Client::~Client()
 
 	send(this->_clientFd, message.c_str(), message.length(), 0);
 	close (this->_clientFd);
+	std::cout << "HEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEERE" << std::endl;
+}
+
+std::string Client::generateMask()
+{
+	std::string res = "";
+	res += this->_nickName;
+	res += '!';
+	res += this->_userName;
+	res += "@127.0.0.1";
+
+	return res;
 }
 
 int Client::getFd() const
@@ -50,16 +63,19 @@ void Client::sendMessage(std::string str)
 void Client::joinChannel(const std::string &channelName)
 {
 	std::ostringstream oss;
-	oss << ':' << this->_nickName << "!realname@127.0.0.1 JOIN :" << channelName;
+	oss << ':' << this->generateMask() << " JOIN :" << channelName;
 	this->sendMessage(oss);
 	
-	Channel *channel = this->_server.getChannels()[channelName];
+	Channel *channel;  
 	if (this->_server.getChannels().find(channelName) == this->_server.getChannels().end())
 	{
 		channel = new Channel(channelName);
 		this->_server.getChannels()[channelName] = channel;
 	}
+	else 
+		channel = this->_server.getChannels()[channelName];
 	this->_channels[channelName] = channel;
+	channel->getClients().push_back(*this);
 }
 
 Server &Client::getServer()
