@@ -1,4 +1,5 @@
 #include "Server.hpp"
+#include "Who.hpp"
 #include <Join.hpp>
 #include <sys/poll.h>
 #include <sys/socket.h>
@@ -8,6 +9,10 @@ Server::Server( int port )
 {
 	// server socket handle
 	this->socketFd = socket(AF_INET, SOCK_STREAM, 0);
+
+	int opt = 1;
+	setsockopt(socketFd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+
 	hint.sin_family = AF_INET;
 	hint.sin_port = htons(port);
 	hint.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
@@ -34,6 +39,7 @@ Server::Server( int port )
 
 	//Registering commands
 	this->commands["join"] = new Join();
+	this->commands["who"] = new Who();
 	success = 1;
 }
 
@@ -57,20 +63,19 @@ int Server::getFd()
 	return this->socketFd;
 }
 
-std::map<std::string, Channel *> Server::getChannels()
+std::map<std::string, Channel *> &Server::getChannels()
 {
 	return this->channels;
 }
 
 Server::~Server() 
 {
-	for (std::map<int, Client *>::iterator it = clients.begin(); it != clients.end(); it++)
-	{
-		delete it->second;
-	}
-
 	close(this->socketFd);
+	for (std::map<int, Client *>::iterator it = clients.begin(); it != clients.end(); it++)
+		delete it->second;
 	for (std::map<std::string, Command *>::iterator it = commands.begin(); it != commands.end(); it++)
+		delete it->second;
+	for (std::map<std::string, Channel *>::iterator it = this->channels.begin(); it != this->channels.end(); it++)
 		delete it->second;
 	std::cout << "server closed" << std::endl;
 }
@@ -83,16 +88,16 @@ int Server::getIndexClient()
 	return (i);
 }
 
-std::string getArg(std::string input)
+std::string getArg(std::string input, std::string toFind)
 {
-	int where = input.find("USER ");
+	int where = input.find(toFind);
 	std::string res = "";
 	if (where == -1)
 		return std::string("");
-	where += 5;
-	for(; input[where] != ' '; where ++)
+	where += toFind.length();
+	for(; input[where] >= 33 && input[where] <= 126; where ++)
 		res += input[where];
-	std::cout << "Nickname is: " << res << std::endl;
+	std::cout << std::endl << "Here is: " << (int)input[where + 1] << std::endl;
 	return res;
 }
 
@@ -114,16 +119,17 @@ void Server::run()
 		{
 			clientFd = accept(this->socketFd, (sockaddr *)&client, &clientSize);
 			recv(clientFd, reading, sizeof(reading), 0);
-			std::string username = getArg(std::string(reading));
-			if (username.empty())
+			std::cout << "----------" << reading << "----------" << std::endl;
+			std::string username = getArg(std::string(reading), "USER ");
+			std::string nickname = getArg(std::string(reading), "NICK ");
+			if (username.empty() || nickname.empty())
 			{
 				close(clientFd);
 				std::cout << "Invalid session tried to connect" << std::endl;
 				continue;
 			}
-			clientClass = new Client(clientFd, getIndexClient(), *this, username);
+			clientClass = new Client(clientFd, getIndexClient(), *this, nickname, username);
 			send(clientClass->getFd(), welcomeMessage.c_str(), welcomeMessage.length(), 0);
-			std::cout << "New user with fd: " << clientFd << " and username: " << clientClass->getName() << std::endl;
 			createFd( clientFd );
 			clients[clientFd] = clientClass;
 			fds.data()->revents = 0;
@@ -139,7 +145,8 @@ void Server::run()
 					{
 						if (std::string(reading).rfind("JOIN ") == 0)
 							this->commands["join"]->execute(reading, *this->clients[it->fd]);
-						else if (std::string(reading).rfind("PRIVMSG "))
+						else if (std::string(reading).rfind("WHO ") == 0)
+							this->commands["who"]->execute(reading, *this->clients[it->fd]);
 						std::cout << "Reading is: " << reading << std::endl;
 					}
 					else

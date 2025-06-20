@@ -34,7 +34,7 @@ class Server
 		Server( int port );
 		~Server();
 		int	getFd();
-		std::map<std::string, Channel *> getChannels();
+		std::map<std::string, Channel *> &getChannels();
 		int	getStatus();
 		int getIndexClient();
 		std::map<int, Client *> &getClients();
@@ -50,3 +50,6 @@ class Server
 		std::vector<struct pollfd> fds;
 		std::map<std::string, Command *> commands; 
 };
+
+
+std::string getArg(std::string input, std::string toFind);
