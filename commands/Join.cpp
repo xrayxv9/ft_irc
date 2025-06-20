@@ -17,7 +17,7 @@ int Join::execute(const std::string &command, Client &cli) const
 		return 0;
 	}
 	std::string channel = "";
-	for (int i = 5; command[i] != '\n'; i++)
+	for (int i = 5; command[i] != '\n' && command[i] != '\r'; i++)
 		channel += command[i];
 	cli.joinChannel(std::string(channel.c_str()));
 	return 1;
