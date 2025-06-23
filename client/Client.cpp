@@ -74,7 +74,6 @@ Channel *Client::joinChannel(const std::string &channelName)
 	else 
 		channel = this->_server.getChannels()[channelName];
 	this->_channels[channelName] = channel;
-	// channel->getClients().push_back(this);
 	return channel;
 }
 
