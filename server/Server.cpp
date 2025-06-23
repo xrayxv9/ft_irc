@@ -1,4 +1,5 @@
 #include "Server.hpp"
+#include "PrivMSG.hpp"
 #include "Who.hpp"
 #include <Join.hpp>
 #include <sys/poll.h>
@@ -41,6 +42,7 @@ Server::Server( int port )
 	this->commands["nick"] = new Nick();
 	this->commands["join"] = new Join();
 	this->commands["who"] = new Who();
+	this->commands["privmsg"] = new PrivMSG();
 	success = 1;
 }
 
@@ -89,14 +91,14 @@ int Server::getIndexClient()
 	return (i);
 }
 
-std::string getArg(std::string input, std::string toFind)
+std::string getArg(std::string input, std::string toFind, bool skipSpace)
 {
 	int where = input.find(toFind);
 	std::string res = "";
 	if (where == -1)
 		return std::string("");
 	where += toFind.length();
-	for(; input[where] >= 33 && input[where] <= 126; where ++)
+	for(; input[where] >= 32 + !skipSpace && input[where] <= 126; where ++)
 		res += input[where];
 	return res;
 }
@@ -144,19 +146,19 @@ void Server::run()
 					if (result)
 					{
 						if (std::string(reading).rfind("JOIN ") == 0)
-							this->commands["join"]->execute(reading, *clientClass);
+							this->commands["join"]->execute(reading, this->clients[it->fd]);
 						else if (std::string(reading).rfind("NICK ") == 0)
-							this->commands["nick"]->execute(reading, *clientClass);
-            else if (std::string(reading).rfind("WHO ") == 0)
+							this->commands["nick"]->execute(reading, this->clients[it->fd]);
+            			else if (std::string(reading).rfind("WHO ") == 0)
 							this->commands["who"]->execute(reading, this->clients[it->fd]);
-						else
-							std::cout << "Not join command" << std::endl;
+						else if (std::string(reading).rfind("PRIVMSG ") == 0)
+							this->commands["privmsg"]->execute(reading, this->clients[it->fd]);
 						std::cout << "Reading is: " << reading << std::endl;
-						std::cout << "___________________________________________________________" << std::endl;
 					}
 					else
 					{
 						std::cout << "left" << std::endl;
+						delete clients[it->fd];
 						clients.erase(it->fd);
 						fds.erase(it);
 						it--;
