@@ -28,7 +28,7 @@ int Who::execute(const std::string &command, Client *cli) const
 	std::cout << "Channel is not null" << std::endl;
 	for (std::vector<Client *>::iterator it = channel->getClients().begin(); it != channel->getClients().end() ; it++)
 	{
-		Client *user = static_cast<Client*>(*it.base());
+		Client *user = *it;
 		if (user == NULL)
 			std::cout << "User is null" << std::endl;
 		else
