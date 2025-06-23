@@ -145,6 +145,7 @@ void Server::executeCommand()
 			else
 			{
 				std::cout << "left" << std::endl;
+				delete clients[it->fd];
 				clients.erase(it->fd);
 				fds.erase(it);
 				it--;

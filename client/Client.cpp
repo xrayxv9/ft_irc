@@ -19,9 +19,6 @@ Client::Client( int fd, int index, Server &server, std::string &userName, std::s
 
 Client::~Client()
 {
-	std::string message;
-
-	send(this->_clientFd, message.c_str(), message.length(), 0);
 	close (this->_clientFd);
 }
 
