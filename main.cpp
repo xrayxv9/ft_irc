@@ -13,7 +13,6 @@ void handle_sigint( int sig )
 int main(int argc, char **argv)
 {
 	std::string portPreConvert;
-	std::string passwd;
 	int port;
 	
 	if (argc != 3)
@@ -35,7 +34,7 @@ int main(int argc, char **argv)
 		return 1;
 	}
 	std::signal(SIGINT, handle_sigint);
-	Server *serv = new Server(port, passwd);
+	Server *serv = new Server(port, argv[2]);
 	if (serv->getStatus() == 0)
 	{
 		delete serv;

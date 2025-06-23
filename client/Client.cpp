@@ -7,7 +7,7 @@ Client::Client( int fd, int index, Server &server, std::string &realName):
 	_clientFd(fd),
 	_nickName(realName)
 {
-	
+	_isRegistered = false;
 	std::ostringstream oss;
 	std::cout << index << std::endl;
 	oss << index;
@@ -81,4 +81,3 @@ void Client::logIn()
 {
 	_isRegistered = 1;
 }
-
