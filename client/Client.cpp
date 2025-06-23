@@ -23,7 +23,6 @@ Client::~Client()
 
 	send(this->_clientFd, message.c_str(), message.length(), 0);
 	close (this->_clientFd);
-	std::cout << "HEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEERE" << std::endl;
 }
 
 std::string Client::generateMask()
