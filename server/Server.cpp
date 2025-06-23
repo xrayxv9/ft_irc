@@ -129,7 +129,7 @@ void Server::run()
 				std::cout << "Invalid session tried to connect" << std::endl;
 				continue;
 			}
-			clientClass = new Client(clientFd, getIndexClient(), *this, nickname, username);
+			clientClass = new Client(clientFd, getIndexClient(), *this, username, nickname);
 			send(clientClass->getFd(), welcomeMessage.c_str(), welcomeMessage.length(), 0);
 			createFd( clientFd );
 			clients[clientFd] = clientClass;
