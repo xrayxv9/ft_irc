@@ -8,5 +8,5 @@ class Join: public Command
 {
 	public:
 		Join();
-		int execute(const std::string &command, Client &cli) const;
+		int execute(const std::string &command, Client *cli) const;
 };
