@@ -2,6 +2,7 @@
 #include "Command.hpp"
 #include "Server.hpp"
 #include <Client.hpp>
+#include <sstream>
 
 Who::Who(): Command("who", "Check who is in the channel")
 {
@@ -13,23 +14,32 @@ Who::~Who()
 
 }
 
-int Who::execute(const std::string &command, Client &cli) const
+int Who::execute(const std::string &command, Client *cli) const
 {
-	return 1;
 	std::string channelName = getArg(command, "WHO ");
-	Channel *channel = cli.getServer().getChannels()[channelName];
-	// std::cout << "--------------------------------" << std::endl << "'" << command << "'" << std::endl << "--------------------------------" << std::endl;
-	// std::cout << "--------------------------------" << std::endl << "'" << channelName << "'" << std::endl << "--------------------------------" << std::endl;
-	std::cout << "Channel name is: '" << channelName << "' and len of all channels is: " << cli.getServer().getChannels().size()  << std::endl;
-	for (std::map<std::string, Channel *>::iterator it = cli.getServer().getChannels().begin() ; it != cli.getServer().getChannels().end(); it ++)
+	Channel *channel = cli->getServer().getChannels()[channelName];
+	for (std::map<std::string, Channel *>::iterator it = cli->getServer().getChannels().begin() ; it != cli->getServer().getChannels().end(); it ++)
 		std::cout << "'" << it->second->getName() << "'" << std::endl;
 	if (channel == NULL)
-		return 1;
-	std::vector<Client> clients = channel->getClients();
-	for (std::vector<Client>::iterator it = clients.begin(); it != channel->getClients().end() ; it++)
 	{
-		cli.sendMessage(cli.getName());	
+		std::cout << "Channel is null" << std::endl;
+		return 1;
 	}
-
+	std::cout << "Channel is not null" << std::endl;
+	for (std::vector<Client *>::iterator it = channel->getClients().begin(); it != channel->getClients().end() ; it++)
+	{
+		Client *user = static_cast<Client*>(*it.base());
+		if (user == NULL)
+			std::cout << "User is null" << std::endl;
+		else
+			std::cout << "User is not null" << std::endl;
+		std::string toSend;
+		std::ostringstream oss;
+		oss << user->getFd() << " " << user->generateMask() << " 127.0.0.1 H ircserv :0 " << user->getNickName();
+		cli->sendMessage(oss);
+	}
+	std::ostringstream oss;
+	oss << cli->getFd() << " " << cli->generateMask() << " :End of WHO list";
+	cli->sendMessage(oss);
 	return 1;
 }

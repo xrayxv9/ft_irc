@@ -9,5 +9,5 @@ class Who: public Command
 	public:
 		Who();
 		~Who();
-		int execute(const std::string &command, Client &cli) const;
+		int execute(const std::string &command, Client *cli) const;
 };
