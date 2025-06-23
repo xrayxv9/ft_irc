@@ -60,12 +60,11 @@ void Client::sendMessage(std::string str)
 	send(this->_clientFd, str.c_str(), str.length(), 0);
 }
 
-void Client::joinChannel(const std::string &channelName)
+Channel *Client::joinChannel(const std::string &channelName)
 {
 	std::ostringstream oss;
 	oss << ':' << this->generateMask() << " JOIN :" << channelName;
 	this->sendMessage(oss);
-	
 	Channel *channel;  
 	if (this->_server.getChannels().find(channelName) == this->_server.getChannels().end())
 	{
@@ -75,7 +74,8 @@ void Client::joinChannel(const std::string &channelName)
 	else 
 		channel = this->_server.getChannels()[channelName];
 	this->_channels[channelName] = channel;
-	channel->getClients().push_back(*this);
+	// channel->getClients().push_back(this);
+	return channel;
 }
 
 Server &Client::getServer()

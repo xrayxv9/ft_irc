@@ -24,7 +24,7 @@ class Client
 		Server &getServer();
 		int getFd() const;
 		std::map<std::string, Channel *> &getChannels();
-		void joinChannel(const std::string &);
+		Channel * joinChannel(const std::string &);
 		void sendMessage(std::ostringstream &);
 		std::string getUserName() const;
 		std::string getNickName() const;
