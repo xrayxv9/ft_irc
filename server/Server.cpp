@@ -1,32 +1,37 @@
 #include "Server.hpp"
 #include "Who.hpp"
 #include <Join.hpp>
+#include <exception>
 #include <sys/poll.h>
 #include <sys/socket.h>
 #include <vector>
 
-Server::Server( int port )
+Server::Server( int port , std::string passwd )
 {
+	// save password
+	int opt = 1;
+	
+	this->_passwd = passwd;
+	std::cout << this->_passwd << std::endl;
 	// server socket handle
 	this->socketFd = socket(AF_INET, SOCK_STREAM, 0);
 
-	int opt = 1;
 	setsockopt(socketFd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
-
 	hint.sin_family = AF_INET;
 	hint.sin_port = htons(port);
 	hint.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
 
 	// poll init
-	createFd( socketFd );
+	createFd( this->socketFd );
 
 	// binding
-	if (bind(socketFd, (sockaddr *)&hint, sizeof(hint)) == -1)
+	if (bind(this->socketFd, (sockaddr *)&hint, sizeof(hint)) == -1)
 	{
 		this->success = 0;
 		std::cerr << "Couldn't bind the server" << std::endl;
 		return ;
 	}
+
 	// listening
 	if (listen(socketFd, SOMAXCONN) == -1)
 	{
@@ -34,13 +39,12 @@ Server::Server( int port )
 		std::cerr << "can't listen" << std::endl;
 		return ;
 	}
-	//fcntl
-	if (fcntl(this->socketFd, O_NONBLOCK))
 
 	//Registering commands
-	this->commands["nick"] = new Nick();
-	this->commands["join"] = new Join();
-	this->commands["who"] = new Who();
+	this->commands["NICK"] = new Nick();
+	this->commands["JOIN"] = new Join();
+	this->commands["pass"] = new Password();
+	this->commands["WHO"] = new Who();
 	success = 1;
 }
 
@@ -71,9 +75,9 @@ std::map<std::string, Channel *> &Server::getChannels()
 
 Server::~Server() 
 {
-	close(this->socketFd);
 	for (std::map<int, Client *>::iterator it = clients.begin(); it != clients.end(); it++)
 		delete it->second;
+	close(this->socketFd);
 	for (std::map<std::string, Command *>::iterator it = commands.begin(); it != commands.end(); it++)
 		delete it->second;
 	for (std::map<std::string, Channel *>::iterator it = this->channels.begin(); it != this->channels.end(); it++)
@@ -101,6 +105,55 @@ std::string getArg(std::string input, std::string toFind)
 	return res;
 }
 
+void Server::executeCommand()
+{
+	int result;
+	char reading[1024] = {0};
+	std::string str_reading;
+	int commandFound= 0;
+
+	for (std::vector<pollfd>::iterator it = fds.begin(); it != fds.end(); it++)
+	{
+		if (it->revents & POLLIN && it.base() != fds.data())
+		{
+			result = recv(it->fd, reading, sizeof(reading) - 1, 0);
+			if (result)
+			{
+				for (int x = 0; reading[x] && reading[x] != ' ' && reading[x] != '\r' && reading[x] != '\n'; x++)
+					str_reading += reading[x];
+				for (std::map<std::string, Command *>::iterator at = commands.begin(); at != commands.end(); at++)
+					if (at->first == str_reading)
+					{
+						if ( this->clients[it->fd]->isRegistered() || str_reading == "pass" )
+						{
+							commandFound = 1;
+							this->commands[str_reading]->execute(reading, *this->clients[it->fd]);
+						}
+						else
+						{
+							this->clients[it->fd]->sendMessage("You are not logged in, please use /pass <password>");
+							return ;
+						} 
+					}
+				if (!commandFound)
+					std::cout << "Command not found, the command was : " << str_reading << std::endl;
+				std::cout << "Reading is: " << reading << std::endl;
+				std::cout << "___________________________________________________________" << std::endl;
+			}
+			else
+			{
+				std::cout << "left" << std::endl;
+				clients.erase(it->fd);
+				fds.erase(it);
+				it--;
+			}
+			it->revents = 0;
+		}
+	}
+
+
+}
+
 void Server::run()
 {
 	sockaddr_in client;
@@ -108,7 +161,6 @@ void Server::run()
 	int clientFd;
 	char reading[1024];
 	Client *clientClass;
-	int result;
 
 	std::string welcomeMessage = "Welcome to the brand new onlyFans Server\n";
 	
@@ -119,15 +171,15 @@ void Server::run()
 		{
 			clientFd = accept(this->socketFd, (sockaddr *)&client, &clientSize);
 			recv(clientFd, reading, sizeof(reading), 0);
+			// if (username.empty())
+			// {
+			// 	close(clientFd);
+			// 	std::cout << "Invalid session tried to connect" << std::endl;
+			// 	continue;
+			// }
 			std::cout << "----------" << reading << "----------" << std::endl;
 			std::string username = getArg(std::string(reading), "USER ");
 			std::string nickname = getArg(std::string(reading), "NICK ");
-			if (username.empty() || nickname.empty())
-			{
-				close(clientFd);
-				std::cout << "Invalid session tried to connect" << std::endl;
-				continue;
-			}
 			clientClass = new Client(clientFd, getIndexClient(), *this, username, nickname);
 			send(clientClass->getFd(), welcomeMessage.c_str(), welcomeMessage.length(), 0);
 			createFd( clientFd );
@@ -136,34 +188,7 @@ void Server::run()
 		}
 		else
 		{
-			for (std::vector<pollfd>::iterator it = fds.begin(); it != fds.end(); it++)
-			{
-				if (it->revents & POLLIN && it.base() != fds.data())
-				{
-					result = recv(it->fd, reading, sizeof(reading), 0);
-					if (result)
-					{
-						if (std::string(reading).rfind("JOIN ") == 0)
-							this->commands["join"]->execute(reading, *clientClass);
-						else if (std::string(reading).rfind("NICK ") == 0)
-							this->commands["nick"]->execute(reading, *clientClass);
-            else if (std::string(reading).rfind("WHO ") == 0)
-							this->commands["who"]->execute(reading, this->clients[it->fd]);
-						else
-							std::cout << "Not join command" << std::endl;
-						std::cout << "Reading is: " << reading << std::endl;
-						std::cout << "___________________________________________________________" << std::endl;
-					}
-					else
-					{
-						std::cout << "left" << std::endl;
-						clients.erase(it->fd);
-						fds.erase(it);
-						it--;
-					}
-					it->revents = 0;
-				}
-			}
+			executeCommand();
 		}
 	}
 }
@@ -172,3 +197,9 @@ std::map<int, Client *> &Server::getClients()
 {
 	return clients;
 }
+
+std::string Server::getPasswd()
+{
+	return _passwd;
+}
+
