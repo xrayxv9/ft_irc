@@ -4,9 +4,10 @@
 
 class Client;
 
-class Join: public Command
+class Who: public Command
 {
 	public:
-		Join();
+		Who();
+		~Who();
 		int execute(const std::string &command, Client *cli) const;
 };

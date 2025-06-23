@@ -36,7 +36,7 @@ class Server
 		Server( int port , std::string passwd );
 		~Server();
 		int	getFd();
-		std::map<std::string, Channel *> getChannels();
+		std::map<std::string, Channel *> &getChannels();
 		int	getStatus();
 		int getIndexClient();
 		void executeCommand();
@@ -56,3 +56,6 @@ class Server
 		std::map<std::string, Command *> commands; 
 		std::string _passwd;
 };
+
+
+std::string getArg(std::string input, std::string toFind);

@@ -1,4 +1,5 @@
 #include "Server.hpp"
+#include "Who.hpp"
 #include <Join.hpp>
 #include <exception>
 #include <sys/poll.h>
@@ -14,6 +15,7 @@ Server::Server( int port , std::string passwd )
 	std::cout << this->_passwd << std::endl;
 	// server socket handle
 	this->socketFd = socket(AF_INET, SOCK_STREAM, 0);
+
 	setsockopt(socketFd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
 	hint.sin_family = AF_INET;
 	hint.sin_port = htons(port);
@@ -42,7 +44,8 @@ Server::Server( int port , std::string passwd )
 	this->commands["NICK"] = new Nick();
 	this->commands["JOIN"] = new Join();
 	this->commands["pass"] = new Password();
-	this->success = 1;
+	this->commands["WHO"] = new Who();
+	success = 1;
 }
 
 void Server::createFd( int fd )
@@ -65,7 +68,7 @@ int Server::getFd()
 	return this->socketFd;
 }
 
-std::map<std::string, Channel *> Server::getChannels()
+std::map<std::string, Channel *> &Server::getChannels()
 {
 	return this->channels;
 }
@@ -76,6 +79,8 @@ Server::~Server()
 		delete it->second;
 	close(this->socketFd);
 	for (std::map<std::string, Command *>::iterator it = commands.begin(); it != commands.end(); it++)
+		delete it->second;
+	for (std::map<std::string, Channel *>::iterator it = this->channels.begin(); it != this->channels.end(); it++)
 		delete it->second;
 	std::cout << "server closed" << std::endl;
 }
@@ -88,16 +93,15 @@ int Server::getIndexClient()
 	return (i);
 }
 
-std::string getArg(std::string input)
+std::string getArg(std::string input, std::string toFind)
 {
-	int where = input.find("USER ");
+	int where = input.find(toFind);
 	std::string res = "";
 	if (where == -1)
 		return std::string("");
-	where += 5;
-	for(; input[where] != ' '; where ++)
+	where += toFind.length();
+	for(; input[where] >= 33 && input[where] <= 126; where ++)
 		res += input[where];
-	std::cout << "Nickname is: " << res << std::endl;
 	return res;
 }
 
@@ -167,16 +171,17 @@ void Server::run()
 		{
 			clientFd = accept(this->socketFd, (sockaddr *)&client, &clientSize);
 			recv(clientFd, reading, sizeof(reading), 0);
-			std::string username = getArg(std::string(reading));
 			// if (username.empty())
 			// {
 			// 	close(clientFd);
 			// 	std::cout << "Invalid session tried to connect" << std::endl;
 			// 	continue;
 			// }
-			clientClass = new Client(clientFd, getIndexClient(), *this, username);
+			std::cout << "----------" << reading << "----------" << std::endl;
+			std::string username = getArg(std::string(reading), "USER ");
+			std::string nickname = getArg(std::string(reading), "NICK ");
+			clientClass = new Client(clientFd, getIndexClient(), *this, username, nickname);
 			send(clientClass->getFd(), welcomeMessage.c_str(), welcomeMessage.length(), 0);
-			std::cout << "New user with fd: " << clientFd << " and username: " << clientClass->getName() << std::endl;
 			createFd( clientFd );
 			clients[clientFd] = clientClass;
 			fds.data()->revents = 0;
