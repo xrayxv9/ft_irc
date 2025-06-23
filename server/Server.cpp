@@ -98,7 +98,6 @@ std::string getArg(std::string input, std::string toFind)
 	where += toFind.length();
 	for(; input[where] >= 33 && input[where] <= 126; where ++)
 		res += input[where];
-	std::cout << std::endl << "Here is: " << (int)input[where + 1] << std::endl;
 	return res;
 }
 
