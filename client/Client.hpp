@@ -29,6 +29,8 @@ class Client
 		std::string getUserName() const;
 		std::string getNickName() const;
 		void sendMessage(std::string);
+		int	isRegistered() const;
+		void logIn();
 		std::string generateMask();
 
 	private:
@@ -37,5 +39,6 @@ class Client
 		int _clientFd;
 		rank _rank;
 		std::string _nickName;
+		int _isRegistered;
 		std::string _userName;
 };

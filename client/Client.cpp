@@ -8,7 +8,7 @@ Client::Client( int fd, int index, Server &server, std::string &userName, std::s
 	_nickName(nickName),
 	_userName(userName)
 {
-	
+	_isRegistered = false;
 	std::ostringstream oss;
 	std::cout << index << std::endl;
 	oss << index;
@@ -86,6 +86,15 @@ std::string Client::getNickName() const
 	return _nickName;
 }
 
+int Client::isRegistered() const
+{
+	return _isRegistered;
+}
+
+void Client::logIn()
+{
+	_isRegistered = 1;
+}
 
 std::string Client::getUserName() const
 {
