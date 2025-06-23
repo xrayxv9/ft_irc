@@ -144,9 +144,9 @@ void Server::run()
 					if (result)
 					{
 						if (std::string(reading).rfind("JOIN ") == 0)
-							this->commands["join"]->execute(reading, *this->clients[it->fd]);
+							this->commands["join"]->execute(reading, this->clients[it->fd]);
 						else if (std::string(reading).rfind("WHO ") == 0)
-							this->commands["who"]->execute(reading, *this->clients[it->fd]);
+							this->commands["who"]->execute(reading, this->clients[it->fd]);
 						std::cout << "Reading is: " << reading << std::endl;
 					}
 					else
