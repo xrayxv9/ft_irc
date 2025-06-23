@@ -21,6 +21,7 @@
 #include <poll.h>
 #include "../client/Client.hpp"
 #include "../channel/Channel.hpp"
+#include "../commands/Nick.hpp"
 
 extern bool g_running;
 

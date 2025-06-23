@@ -38,6 +38,7 @@ Server::Server( int port )
 	if (fcntl(this->socketFd, O_NONBLOCK))
 
 	//Registering commands
+	this->commands["nick"] = new Nick();
 	this->commands["join"] = new Join();
 	this->commands["who"] = new Who();
 	success = 1;
@@ -138,16 +139,21 @@ void Server::run()
 		{
 			for (std::vector<pollfd>::iterator it = fds.begin(); it != fds.end(); it++)
 			{
-				if (it->revents & POLLIN)
+				if (it->revents & POLLIN && it.base() != fds.data())
 				{
 					result = recv(it->fd, reading, sizeof(reading), 0);
 					if (result)
 					{
 						if (std::string(reading).rfind("JOIN ") == 0)
-							this->commands["join"]->execute(reading, this->clients[it->fd]);
-						else if (std::string(reading).rfind("WHO ") == 0)
+							this->commands["join"]->execute(reading, *clientClass);
+						else if (std::string(reading).rfind("NICK ") == 0)
+							this->commands["nick"]->execute(reading, *clientClass);
+            else if (std::string(reading).rfind("WHO ") == 0)
 							this->commands["who"]->execute(reading, this->clients[it->fd]);
+						else
+							std::cout << "Not join command" << std::endl;
 						std::cout << "Reading is: " << reading << std::endl;
+						std::cout << "___________________________________________________________" << std::endl;
 					}
 					else
 					{
