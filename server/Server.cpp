@@ -1,4 +1,5 @@
 #include "Server.hpp"
+#include "PrivMSG.hpp"
 #include "Who.hpp"
 #include <Join.hpp>
 #include <exception>
@@ -41,6 +42,7 @@ Server::Server( int port , std::string passwd )
 	}
 
 	//Registering commands
+	this->commands["PRIVMSG"] = new PrivMSG();
 	this->commands["NICK"] = new Nick();
 	this->commands["JOIN"] = new Join();
 	this->commands["pass"] = new Password();
@@ -93,14 +95,14 @@ int Server::getIndexClient()
 	return (i);
 }
 
-std::string getArg(std::string input, std::string toFind)
+std::string getArg(std::string input, std::string toFind, bool skipSpace)
 {
 	int where = input.find(toFind);
 	std::string res = "";
 	if (where == -1)
 		return std::string("");
 	where += toFind.length();
-	for(; input[where] >= 33 && input[where] <= 126; where ++)
+	for(; input[where] >= 32 + !skipSpace && input[where] <= 126; where ++)
 		res += input[where];
 	return res;
 }
@@ -127,7 +129,7 @@ void Server::executeCommand()
 						if ( this->clients[it->fd]->isRegistered() || str_reading == "pass" )
 						{
 							commandFound = 1;
-							this->commands[str_reading]->execute(reading, *this->clients[it->fd]);
+							this->commands[str_reading]->execute(reading, this->clients[it->fd]);
 						}
 						else
 						{

@@ -25,7 +25,7 @@ int Nick::execute(const std::string &command, Client *cli) const
 	std::cout << nick << std::endl;
 	if (command[x] != '\r' && !std::isalnum(command[x]))
 	{
-		std::cerr << cli.getName() << ": Erroneus Nickname" << std::endl;
+		std::cerr << cli->getNickName() << ": Erroneus Nickname" << std::endl;
 		std::cout << "here is the char : " << std::endl;
 		std::cout << command[x] << "."<< std::endl;
 		return 0;
@@ -42,8 +42,8 @@ int Nick::execute(const std::string &command, Client *cli) const
 
 	std::ostringstream oss;
 
-	oss <<  ':' << cli.getName() << "!realname@ircserv NICK :" << nick;
-	cli.sendMessage(oss);
+	oss <<  ':' << cli->getNickName() << "!realname@ircserv NICK :" << nick;
+	cli->sendMessage(oss);
 	std::cout << "test" << std::endl;
 	return 1;
 }

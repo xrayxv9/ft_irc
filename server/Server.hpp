@@ -58,4 +58,4 @@ class Server
 };
 
 
-std::string getArg(std::string input, std::string toFind);
+std::string getArg(std::string input, std::string toFind, bool skipSpace = false);

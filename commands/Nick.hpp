@@ -9,5 +9,5 @@ class Nick : public Command
 	public :
 		Nick();
 
-		int execute(const std::string &command, Client &cli) const;
+		int execute(const std::string &command, Client *cli) const;
 };
