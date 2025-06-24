@@ -8,6 +8,8 @@ Channel::Channel(std::string channelName): _channelName(channelName) {}
 
 Channel::Channel(std::string channelName, Client *client): _channelName(channelName)
 {
+	_mode = "";
+	_inviteOnly = false;
 	_clientList.push_back(client);
 	std::cout << "Creating channel with " << channelName << std::endl;
 }
@@ -38,3 +40,20 @@ void Channel::kick(Client *cli)
 
 Channel::~Channel()
 {}
+
+std::vector<Client *> &Channel::getModo()
+{
+	return _modoList;
+}
+
+void Channel::setInviteOnly( bool inviteOnly )
+{
+	if ( inviteOnly )
+		sendMessage("127.0.0.1 ");
+	_inviteOnly = inviteOnly;
+}
+
+std::string &Channel::getMode()
+{
+	return _mode;
+}
