@@ -1,6 +1,7 @@
 #include "Channel.hpp"
 #include "../client/Client.hpp"
 #include <algorithm>
+#include <ctime>
 #include <sys/socket.h>
 #include <vector>
 
@@ -34,6 +35,28 @@ void Channel::kick(Client *cli)
 	if (it == this->_clientList.end())
 		return ;
 	this->_clientList.erase(it);
+}
+
+const std::string &Channel::getTopic() const
+{
+	return this->_topic;
+}
+
+void Channel::setTopic(const std::string &topic, const std::string &who)
+{
+	this->_topic = topic;
+	this->_whoSetTopic = who;
+	std::time(&this->_ts);
+}
+
+const time_t &Channel::lastUpate() const
+{
+	return this->_ts;
+}
+
+const std::string &Channel::whoSetTopic() const
+{
+	return this->_whoSetTopic;
 }
 
 Channel::~Channel()
