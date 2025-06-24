@@ -13,7 +13,7 @@ Topic::~Topic()
 
 }
 
-//TODO: Permission, RPL_TOPICWHOTIME
+//TODO: Permission
 
 int Topic::execute(const std::string &command, Client *cli) const
 {
