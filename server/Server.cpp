@@ -1,6 +1,7 @@
 #include "Server.hpp"
 #include "Kick.hpp"
 #include "PrivMSG.hpp"
+#include "Topic.hpp"
 #include "Who.hpp"
 #include <Join.hpp>
 #include <exception>
@@ -50,6 +51,7 @@ Server::Server( int port , std::string passwd )
 	this->commands["pass"] = new Password();
 	this->commands["WHO"] = new Who();
 	this->commands["KICK"] = new Kick();
+	this->commands["TOPIC"] = new Topic();
 	success = 1;
 }
 
