@@ -15,6 +15,7 @@ class Channel
 		void recv();
 		std::vector<Client *> &getClients();
 		std::string getName();	
+		void kick(Client *);	
 
 	private :
 		std::string _channelName;

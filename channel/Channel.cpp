@@ -1,5 +1,6 @@
 #include "Channel.hpp"
 #include "../client/Client.hpp"
+#include <algorithm>
 #include <sys/socket.h>
 #include <vector>
 
@@ -26,6 +27,14 @@ std::string Channel::getName()
 {
 	return this->_channelName;
 }	
+
+void Channel::kick(Client *cli)
+{
+	std::vector<Client *>::iterator it = std::find(this->_clientList.begin(), this->_clientList.end() + 2, cli);
+	if (it == this->_clientList.end())
+		return ;
+	this->_clientList.erase(it);
+}
 
 Channel::~Channel()
 {}
