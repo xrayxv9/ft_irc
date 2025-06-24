@@ -1,8 +1,10 @@
 #include "Server.hpp"
+#include "Kick.hpp"
 #include "PrivMSG.hpp"
 #include "Who.hpp"
 #include <Join.hpp>
 #include <exception>
+#include <map>
 #include <sys/poll.h>
 #include <sys/socket.h>
 #include <vector>
@@ -47,6 +49,7 @@ Server::Server( int port , std::string passwd )
 	this->commands["JOIN"] = new Join();
 	this->commands["pass"] = new Password();
 	this->commands["WHO"] = new Who();
+	this->commands["KICK"] = new Kick();
 	success = 1;
 }
 
@@ -173,15 +176,15 @@ void Server::run()
 		{
 			clientFd = accept(this->socketFd, (sockaddr *)&client, &clientSize);
 			recv(clientFd, reading, sizeof(reading), 0);
-			// if (username.empty())
-			// {
-			// 	close(clientFd);
-			// 	std::cout << "Invalid session tried to connect" << std::endl;
-			// 	continue;
-			// }
-			std::cout << "----------" << reading << "----------" << std::endl;
 			std::string username = getArg(std::string(reading), "USER ");
 			std::string nickname = getArg(std::string(reading), "NICK ");
+			if (username.empty() || nickname.empty())
+			{
+				close(clientFd);
+				std::cout << "Invalid session tried to connect" << std::endl;
+				continue;
+			}
+			std::cout << "-----" << clientFd << "-----" << reading << "----------" << std::endl;
 			clientClass = new Client(clientFd, getIndexClient(), *this, username, nickname);
 			send(clientClass->getFd(), welcomeMessage.c_str(), welcomeMessage.length(), 0);
 			createFd( clientFd );
@@ -205,3 +208,10 @@ std::string Server::getPasswd()
 	return _passwd;
 }
 
+Client *Server::getClientByString(const std::string &toFind)
+{
+	for (std::map<int, Client *>::iterator it = this->clients.begin(); it != this->clients.end(); it++)
+		if (it->second->getUserName() == toFind)
+			return it->second;
+	return NULL;
+}

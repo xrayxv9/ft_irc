@@ -15,8 +15,13 @@ class Channel
 		void recv();
 		std::vector<Client *> &getClients();
 		std::string getName();	
+		void kick(Client *);
+		template< class T>
+		void kick(T);
 
 	private :
 		std::string _channelName;
 		std::vector<Client *> _clientList;
 };
+
+#include "Channel.tpp"

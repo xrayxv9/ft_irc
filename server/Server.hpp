@@ -43,6 +43,7 @@ class Server
 		std::string getPasswd();
 		std::map<int, Client *> &getClients();
 		void run();
+		Client *getClientByString(const std::string &toFind);	
 
 	private:
 		void createFd( int fd );

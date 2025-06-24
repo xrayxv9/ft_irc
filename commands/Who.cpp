@@ -18,8 +18,6 @@ int Who::execute(const std::string &command, Client *cli) const
 {
 	std::string channelName = getArg(command, "WHO ");
 	Channel *channel = cli->getServer().getChannels()[channelName];
-	for (std::map<std::string, Channel *>::iterator it = cli->getServer().getChannels().begin() ; it != cli->getServer().getChannels().end(); it ++)
-		std::cout << "'" << it->second->getName() << "'" << std::endl;
 	if (channel == NULL)
 	{
 		std::cout << "Channel is null" << std::endl;
