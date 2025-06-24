@@ -48,14 +48,14 @@ std::map<std::string, Channel *> &Client::getChannels()
 
 void Client::sendMessage(std::ostringstream &message)
 {
-	message << '\n';
+	message << "\r\n";
 	std::string str = message.str();
 	send(this->_clientFd, str.c_str(), str.length(), 0);
 }
 
 void Client::sendMessage(std::string str)
 {
-	str += '\n';
+	str += "\r\n";
 	send(this->_clientFd, str.c_str(), str.length(), 0);
 }
 
