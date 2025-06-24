@@ -36,5 +36,15 @@ void Channel::kick(Client *cli)
 	this->_clientList.erase(it);
 }
 
+const std::string &Channel::getTopic() const
+{
+	return this->_topic;
+}
+
+void Channel::setTopic(const std::string &topic)
+{
+	this->_topic = topic;
+}
+
 Channel::~Channel()
 {}
