@@ -1,5 +1,8 @@
 
 #include <Server.hpp>
+#include <cstddef>
+#include <iostream>
+#include <string>
 
 bool g_running = true;
 
@@ -9,6 +12,28 @@ void handle_sigint( int sig )
 	(void)sig;
 	g_running = false;
 }
+
+std::vector<std::string> split(std::string str, char toSplit)
+{
+	std::vector<std::string> res;
+	std::string toAdd = "";
+	
+	for (size_t i = 0; i < str.length(); i++)
+	{
+		if (str[i] == toSplit)
+		{
+			res.push_back(toAdd);
+			toAdd = "";
+			continue ;
+		}
+		toAdd += str[i];
+	}
+	res.push_back(toAdd);
+	toAdd = "";
+	res.push_back(toAdd);
+	return res;
+}
+
 
 int main(int argc, char **argv)
 {
