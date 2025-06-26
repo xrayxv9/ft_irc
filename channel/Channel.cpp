@@ -5,9 +5,9 @@
 #include <sys/socket.h>
 #include <vector>
 
-Channel::Channel(std::string channelName): _channelName(channelName) {}
+Channel::Channel(std::string channelName, std::string password): _channelName(channelName), _password(password) {}
 
-Channel::Channel(std::string channelName, Client *client): _channelName(channelName)
+Channel::Channel(std::string channelName, std::string password, Client *client): _channelName(channelName), _password(password)
 {
 	_clientList.push_back(client);
 	std::cout << "Creating channel with " << channelName << std::endl;
@@ -57,6 +57,21 @@ const time_t &Channel::lastUpate() const
 const std::string &Channel::whoSetTopic() const
 {
 	return this->_whoSetTopic;
+}
+
+const std::string &Channel::whoSetTopicMask() const
+{
+	return this->_whoSetTopicMask;
+}
+
+void Channel::setTopicMask(const std::string &mask)
+{
+	this->_whoSetTopicMask = mask;
+}
+
+const std::string &Channel::getPassword() const
+{
+	return this->_password;
 }
 
 Channel::~Channel()
