@@ -10,6 +10,7 @@ Channel::Channel(std::string channelName, Client *client): _channelName(channelN
 {
 	_mode = "";
 	_inviteOnly = false;
+	_isAdminRestricted = true;
 	_clientList.push_back(client);
 	std::cout << "Creating channel with " << channelName << std::endl;
 }
@@ -57,3 +58,9 @@ std::string &Channel::getMode()
 {
 	return _mode;
 }
+
+bool Channel::isRestricted()
+{
+	return _isAdminRestricted;
+}
+

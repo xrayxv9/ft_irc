@@ -21,11 +21,13 @@ class Channel
 		void kick(T);
 		void setInviteOnly( bool inviteOnly );
 		bool isInviteOnly();
+		bool isRestricted();
 		std::string &getMode();
 		
 
 	private :
 		bool _inviteOnly;
+		bool _isAdminRestricted;
 		std::string _mode;
 		std::string _channelName;
 		std::vector<Client *> _clientList;
