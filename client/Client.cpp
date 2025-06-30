@@ -69,6 +69,7 @@ Channel *Client::joinChannel(const std::string &channelName, const std::string &
 	{
 		channel = new Channel(channelName, key);
 		this->_server.getChannels()[channelName] = channel;
+		channel->getModo().push_back(this);
 	}
 	else
 	{

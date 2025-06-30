@@ -3,6 +3,7 @@
 #include "Kick.hpp"
 #include "Names.hpp"
 #include "PrivMSG.hpp"
+#include "Mode.hpp"
 #include "Topic.hpp"
 #include "Who.hpp"
 #include <Join.hpp>
@@ -53,6 +54,7 @@ Server::Server( int port , std::string passwd )
 	this->commands["pass"] = new Password();
 	this->commands["WHO"] = new Who();
 	this->commands["KICK"] = new Kick();
+	this->commands["MODE"] = new Mode();
 	this->commands["TOPIC"] = new Topic();
 	this->commands["INVITE"] = new Invite();
 	this->commands["NAMES"] = new Names();
