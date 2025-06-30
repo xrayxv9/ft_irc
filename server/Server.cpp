@@ -1,6 +1,7 @@
 #include "Server.hpp"
 #include "Invite.hpp"
 #include "Kick.hpp"
+#include "Names.hpp"
 #include "PrivMSG.hpp"
 #include "Topic.hpp"
 #include "Who.hpp"
@@ -54,6 +55,7 @@ Server::Server( int port , std::string passwd )
 	this->commands["KICK"] = new Kick();
 	this->commands["TOPIC"] = new Topic();
 	this->commands["INVITE"] = new Invite();
+	this->commands["NAMES"] = new Names();
 	success = 1;
 }
 
