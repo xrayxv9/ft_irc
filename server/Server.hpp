@@ -57,5 +57,4 @@ class Server
 		std::string _passwd;
 };
 
-
 std::string getArg(std::string input, std::string toFind, bool skipSpace = false);

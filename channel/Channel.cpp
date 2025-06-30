@@ -6,9 +6,9 @@
 #include <sys/socket.h>
 #include <vector>
 
-Channel::Channel(std::string channelName): _channelName(channelName) {}
+Channel::Channel(std::string channelName, std::string password): _channelName(channelName), _password(password) {}
 
-Channel::Channel(std::string channelName, Client *client): _channelName(channelName)
+Channel::Channel(std::string channelName, std::string password, Client *client): _channelName(channelName), _password(password)
 {
 	_mode = "";
 	_isPasswordLimited = false;
@@ -40,6 +40,43 @@ void Channel::kick(Client *cli)
 	if (it == this->_clientList.end())
 		return ;
 	this->_clientList.erase(it);
+}
+
+const std::string &Channel::getTopic() const
+{
+	return this->_topic;
+}
+
+void Channel::setTopic(const std::string &topic, const std::string &who)
+{
+	this->_topic = topic;
+	this->_whoSetTopic = who;
+	std::time(&this->_ts);
+}
+
+const time_t &Channel::lastUpate() const
+{
+	return this->_ts;
+}
+
+const std::string &Channel::whoSetTopic() const
+{
+	return this->_whoSetTopic;
+}
+
+const std::string &Channel::whoSetTopicMask() const
+{
+	return this->_whoSetTopicMask;
+}
+
+void Channel::setTopicMask(const std::string &mask)
+{
+	this->_whoSetTopicMask = mask;
+}
+
+const std::string &Channel::getPassword() const
+{
+	return this->_password;
 }
 
 Channel::~Channel()
