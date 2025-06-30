@@ -1,6 +1,7 @@
 #include "Server.hpp"
 #include "Invite.hpp"
 #include "Kick.hpp"
+#include "Names.hpp"
 #include "PrivMSG.hpp"
 #include "Topic.hpp"
 #include "Who.hpp"
@@ -54,6 +55,7 @@ Server::Server( int port , std::string passwd )
 	this->commands["KICK"] = new Kick();
 	this->commands["TOPIC"] = new Topic();
 	this->commands["INVITE"] = new Invite();
+	this->commands["NAMES"] = new Names();
 	success = 1;
 }
 
@@ -152,7 +154,10 @@ void Server::executeCommand()
 			else
 			{
 				std::cout << "left" << std::endl;
+				Client *cli;
+				cli = clients[it->fd];
 				clients.erase(it->fd);
+				delete cli;
 				fds.erase(it);
 				it--;
 			}
@@ -171,7 +176,7 @@ void Server::run()
 	char reading[1024];
 	Client *clientClass;
 
-	std::string welcomeMessage = "Welcome to the brand new onlyFans Server\n";
+	std::string welcomeMessage = "Welcome to the brand new onlyFans Server";
 	
 	while (g_running)
 	{
@@ -190,7 +195,7 @@ void Server::run()
 			}
 			std::cout << "-----" << clientFd << "-----" << reading << "----------" << std::endl;
 			clientClass = new Client(clientFd, getIndexClient(), *this, username, nickname);
-			send(clientClass->getFd(), welcomeMessage.c_str(), welcomeMessage.length(), 0);
+			clientClass->sendMessage(welcomeMessage);
 			createFd( clientFd );
 			clients[clientFd] = clientClass;
 			fds.data()->revents = 0;
