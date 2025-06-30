@@ -25,17 +25,13 @@ int Mode::execute(const std::string &command, Client *cli) const
 {
 	std::string channelName;
 	std::string options;
+	std::ostringstream oss;
 	std::string arg = getArg(command, "MODE ", true);
 	std::vector<std::string> args = getAllArgs(arg);
 	std::vector<std::string>::iterator it = args.begin();
+	size_t iter = 1;
 	bool isAdmin = false;
 	char mode = '+';
-
-	if ((*it)[0] != '#')
-	{
-		cli->sendMessage("no channel given");
-		return 0;
-	}
 
 	channelName = *it;
 	Channel *channelNeeded = NULL;
@@ -55,7 +51,6 @@ int Mode::execute(const std::string &command, Client *cli) const
 			}
 		}
 	}
-
 	if (!channelNeeded)
 	{
 		cli->sendMessage("The channel doesn't exist");
@@ -76,15 +71,35 @@ int Mode::execute(const std::string &command, Client *cli) const
 		else if ((*it)[i] == '-')
 			mode = '-';
 		if ((*it)[i] == 'i')
-			iCommand(mode == '+');
+			iCommand(mode == '+', channelNeeded, cli);
 		else if ((*it)[i] == 'k')
-			kCommand(*(it + 1), mode == '+');
+		{
+			if (args.size() > iter)
+				kCommand(*(it + iter++), mode == '+', channelNeeded, cli);
+		}
 		else if ((*it)[i] == 'l')
-			lCommand(mode == '+');
+		{
+			// TODO ADD THE VERIF FOR THE INTS HERE !
+			lCommand(1, mode == '+', channelNeeded, cli);
+		}
 		else if ((*it)[i] == 'o')
-			oCommand(mode == '+');
+		{
+			if (args.size() > iter)
+			{
+				std::vector<Client *> clients = channelNeeded->getClients();
+				std::vector<Client *>::iterator at = clients.begin();
+				for (; at != clients.end(); at++)
+				{
+					if (*(it + iter) == (*at)->getNickName())
+						break;
+				}
+				oCommand(mode == '+', channelNeeded, *at, cli);
+			}
+			oss << ":" << cli->generateMask() << " :No such nick/channel";
+			cli->sendMessage(oss);
+		}
 		else if ((*it)[i] == 't')
-			tCommand(mode == '+');
+			tCommand(mode == '+', channelNeeded, cli);
 		else if (!isalpha((*it)[i]))
 		{
 			cli->sendMessage("Unknown character");
@@ -110,4 +125,27 @@ std::vector<std::string> Mode::getAllArgs(std::string &command) const
 		opt = "";
 	}
 	return (args);
+}
+
+void Mode::iCommand(bool cond, Channel *channel, Client *cli ) const
+{
+	channel->setInviteOnly(cond, cli);
+}
+
+void Mode::kCommand(std::string password, bool cond, Channel *channel, Client * cli ) const
+{
+	channel->setPassword(password, cond, cli);
+}
+
+void Mode::lCommand(int limit, bool cond, Channel *channel, Client * cli ) const
+{
+	channel->setUserLimit(cond, limit, cli);
+}
+void Mode::oCommand(bool cond, Channel *channel, Client * clientToMod, Client *cli) const
+{
+	channel->setModo(clientToMod, cond, cli);
+}
+void Mode::tCommand(bool cond, Channel *channel, Client * cli ) const
+{
+	channel->restrictTopic(cond, cli);
 }
