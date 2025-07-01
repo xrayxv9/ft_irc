@@ -135,10 +135,11 @@ void Server::executeCommand()
 			}
 			for (std::vector<std::string>::iterator it = client->getQueue().begin(); it != client->getQueue().end(); it++)
 			{
+				std::cout << "------" << client->getQueue().size() << "------"<< std::endl;
 				command = "";
-				for (int x = 0; (*it)[x] && (*it)[x] != ' ' && (*it)[x] != '\r' && (*it)[x] != '\n'; x++)
+				for (int x = 0; (*it)[x] != '\0' && (*it)[x] != ' ' && (*it)[x] != '\r' && (*it)[x] != '\n'; x++)
 					command += (*it)[x];
-
+				std::cout << "Searching command '" << command << '\'' << std::endl;
 				if (this->commands[command] == NULL)
 				{
 					//Invalid command
@@ -150,9 +151,10 @@ void Server::executeCommand()
 				else
 					client->sendMessage("You are not logged in, please use /pass <password>");
 				client->getQueue().erase(it);
-				std::cout << "Reading is: " << command << std::endl;
+				it--;
+				// std::cout << "Reading is: " << command << std::endl;
+				std::cout << "___________________________________________________________" << std::endl;
 			}
-			std::cout << "___________________________________________________________" << std::endl;
 		}
 		it->revents = 0;
 	}

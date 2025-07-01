@@ -122,19 +122,19 @@ int Client::updateQueue()
 		std::vector<std::string> splitted = split(std::string(reading), '\n');
 		for (std::vector<std::string>::iterator it = splitted.begin(); it != splitted.end(); it++)
 		{
-			// std::cout << "Last character is " << (int)(*it)[(*it).size() - 1] << std::endl;
 			if ((*it)[(*it).size() - 1] == '\r')
 			{
 				std::cout << "Adding " << *it << std::endl;
 				this->_queue.push_back(this->_buff + *it);
-				this->_buff = "";
+				this->_buff.clear();
 			}
 			else
 			{
 				this->_buff = *it;
-				// std::cout << "Buffer is now " << this->_buff << std::endl;
+				std::cout << "Buffer is now " << this->_buff << std::endl;
 			}
 		}
+		std::cout << "At the end size is: " << _queue.size() << std::endl;
 
 	}
 	else
