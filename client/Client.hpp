@@ -19,7 +19,7 @@ class Client;
 class Client
 {
 	public:
-		Client( int fd, int index, Server &server);
+		Client( int fd, int index, Server &);
 		~Client();
 		Server &getServer();
 		int getFd() const;
@@ -34,6 +34,8 @@ class Client
 		std::string generateMask();
 		void setNickName( std::string );
 		void setUserName( std::string );
+		std::vector<std::string> &getQueue();
+		int updateQueue();
 
 	private:
 		std::map<std::string, Channel *> _channels;
@@ -43,4 +45,6 @@ class Client
 		std::string _nickName;
 		int _isRegistered;
 		std::string _userName;
+		std::vector<std::string> _queue;
+		std::string _buff;
 };
