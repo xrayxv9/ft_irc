@@ -1,4 +1,4 @@
-#include "Server.hpp"
+#include <Server.hpp>
 #include "Invite.hpp"
 #include "Kick.hpp"
 #include "Names.hpp"
@@ -7,7 +7,6 @@
 #include "Topic.hpp"
 #include "Who.hpp"
 #include <Join.hpp>
-#include <exception>
 #include <map>
 #include <sys/poll.h>
 #include <sys/socket.h>
@@ -120,54 +119,43 @@ std::string getArg(std::string input, std::string toFind, bool skipSpace)
 
 void Server::executeCommand()
 {
-	int result;
-	char reading[1024] = {0};
-	std::string str_reading;
-	int commandFound= 0;
+	// char reading[1024] = {0};
+	std::string command;
+	// int commandFound= 0;
 
 	for (std::vector<pollfd>::iterator it = fds.begin(); it != fds.end(); it++)
 	{
 		if (it->revents & POLLIN && it.base() != fds.data())
 		{
-			result = recv(it->fd, reading, sizeof(reading) - 1, 0);
-			if (result)
+			Client *client = this->clients[it->fd];
+			if (client->updateQueue())
 			{
-				for (int x = 0; reading[x] && reading[x] != ' ' && reading[x] != '\r' && reading[x] != '\n'; x++)
-					str_reading += reading[x];
-				for (std::map<std::string, Command *>::iterator at = commands.begin(); at != commands.end(); at++)
-					if (at->first == str_reading)
-					{
-						if ( this->clients[it->fd]->isRegistered() || str_reading == "pass" )
-						{
-							commandFound = 1;
-							this->commands[str_reading]->execute(reading, this->clients[it->fd]);
-						}
-						else
-						{
-							this->clients[it->fd]->sendMessage("You are not logged in, please use /pass <password>");
-							return ;
-						} 
-					}
-				if (!commandFound)
-					std::cout << "Command not found, the command was : " << str_reading << std::endl;
-				std::cout << "Reading is: " << reading << std::endl;
-				std::cout << "___________________________________________________________" << std::endl;
-			}
-			else
-			{
-				std::cout << "left" << std::endl;
-				Client *cli;
-				cli = clients[it->fd];
-				clients.erase(it->fd);
-				delete cli;
 				fds.erase(it);
-				it--;
+				continue ;
 			}
-			it->revents = 0;
+			for (std::vector<std::string>::iterator it = client->getQueue().begin(); it != client->getQueue().end(); it++)
+			{
+				command = "";
+				for (int x = 0; (*it)[x] && (*it)[x] != ' ' && (*it)[x] != '\r' && (*it)[x] != '\n'; x++)
+					command += (*it)[x];
+
+				if (this->commands[command] == NULL)
+				{
+					//Invalid command
+					std::cout << "Invalid command '" << command << '\'' << std::endl;
+					continue ;
+				}
+				if (client->isRegistered() || command == "USER" || command == "NICK" || command == "PASS")
+					this->commands[command]->execute(*it, client);
+				else
+					client->sendMessage("You are not logged in, please use /pass <password>");
+				client->getQueue().erase(it);
+				std::cout << "Reading is: " << command << std::endl;
+			}
+			std::cout << "___________________________________________________________" << std::endl;
 		}
+		it->revents = 0;
 	}
-
-
 }
 
 void Server::run()
@@ -175,7 +163,7 @@ void Server::run()
 	sockaddr_in client;
 	socklen_t clientSize = sizeof(client);
 	int clientFd;
-	char reading[1024];
+	// char reading[1024];
 	Client *clientClass;
 
 	std::string welcomeMessage = "Welcome to the brand new onlyFans Server";
@@ -186,17 +174,18 @@ void Server::run()
 		if (fds.data()->revents & POLLIN)
 		{
 			clientFd = accept(this->socketFd, (sockaddr *)&client, &clientSize);
-			recv(clientFd, reading, sizeof(reading), 0);
-			std::string username = getArg(std::string(reading), "USER ");
-			std::string nickname = getArg(std::string(reading), "NICK ");
-			if (username.empty() || nickname.empty())
-			{
-				close(clientFd);
-				std::cout << "Invalid session tried to connect" << std::endl;
-				continue;
-			}
-			std::cout << "-----" << clientFd << "-----" << reading << "----------" << std::endl;
-			clientClass = new Client(clientFd, getIndexClient(), *this, username, nickname);
+			// recv(clientFd, reading, sizeof(reading), 0);
+			// std::string username = getArg(std::string(reading), "USER ");
+			// std::string nickname = getArg(std::string(reading), "NICK ");
+			// std::string password = getArg(std::string(reading), "PASS ");
+			// if (username.empty() || nickname.empty() || password.empty())
+			// {
+			// 	close(clientFd);
+			// 	std::cout << "Invalid session tried to connect" << std::endl;
+			// 	continue;
+			// }
+			std::cout << "-----" << clientFd << "---------------" << std::endl;
+			clientClass = new Client(clientFd, getIndexClient(), *this);
 			clientClass->sendMessage(welcomeMessage);
 			createFd( clientFd );
 			clients[clientFd] = clientClass;
