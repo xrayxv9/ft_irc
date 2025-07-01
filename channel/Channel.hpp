@@ -26,7 +26,8 @@ class Channel
 		void setPassword( std::string, bool, Client * );
 		void setModo( Client *, bool, Client * );
 		void setUserLimit( bool, int, Client * );
-		
+		void setMode( char, bool, Client *);
+		void setTimeStamp();
 
 		// getter
 		bool isInviteOnly();
@@ -37,6 +38,7 @@ class Channel
 		std::vector<Client *> &getModo();
 		int getUserLimit();
 		std::vector<Client *>::iterator isModo( Client * );
+		time_t getTimeStamp();
 
 
 		const std::string &getTopic() const;
@@ -61,7 +63,7 @@ class Channel
 		std::string _whoSetTopic;
 		std::string _whoSetTopicMask;
 		std::time_t _ts;
-		std::string _password;
+		std::time_t _tsMode;
 };
 
 #include "Channel.tpp"

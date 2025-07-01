@@ -54,6 +54,7 @@ class Server
 		std::map<int, Client *> clients;
 		std::vector<struct pollfd> fds;
 		std::map<std::string, Command *> commands; 
+		std::string buffer;
 		std::string _passwd;
 };
 

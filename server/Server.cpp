@@ -5,6 +5,7 @@
 #include "PrivMSG.hpp"
 #include "Mode.hpp"
 #include "Topic.hpp"
+#include "User.hpp"
 #include "Who.hpp"
 #include <Join.hpp>
 #include <exception>
@@ -51,13 +52,14 @@ Server::Server( int port , std::string passwd )
 	this->commands["PRIVMSG"] = new PrivMSG();
 	this->commands["NICK"] = new Nick();
 	this->commands["JOIN"] = new Join();
-	this->commands["pass"] = new Password();
+	this->commands["PASS"] = new Password();
 	this->commands["WHO"] = new Who();
 	this->commands["KICK"] = new Kick();
 	this->commands["MODE"] = new Mode();
 	this->commands["TOPIC"] = new Topic();
 	this->commands["INVITE"] = new Invite();
 	this->commands["NAMES"] = new Names();
+	this->commands["USER"] = new User();
 	success = 1;
 }
 
@@ -137,16 +139,15 @@ void Server::executeCommand()
 				for (std::map<std::string, Command *>::iterator at = commands.begin(); at != commands.end(); at++)
 					if (at->first == str_reading)
 					{
-						if ( this->clients[it->fd]->isRegistered() || str_reading == "pass" )
+						if ( this->clients[it->fd]->isRegistered() || str_reading == "PASS" || str_reading == "NICK" || str_reading == "USER")
 						{
 							commandFound = 1;
 							this->commands[str_reading]->execute(reading, this->clients[it->fd]);
 						}
 						else
 						{
-							this->clients[it->fd]->sendMessage("You are not logged in, please use /pass <password>");
-							return ;
-						} 
+							std::cout << "not registered" << std::endl;
+						}
 					}
 				if (!commandFound)
 					std::cout << "Command not found, the command was : " << str_reading << std::endl;
@@ -187,16 +188,16 @@ void Server::run()
 		{
 			clientFd = accept(this->socketFd, (sockaddr *)&client, &clientSize);
 			recv(clientFd, reading, sizeof(reading), 0);
-			std::string username = getArg(std::string(reading), "USER ");
-			std::string nickname = getArg(std::string(reading), "NICK ");
-			if (username.empty() || nickname.empty())
-			{
-				close(clientFd);
-				std::cout << "Invalid session tried to connect" << std::endl;
-				continue;
-			}
-			std::cout << "-----" << clientFd << "-----" << reading << "----------" << std::endl;
-			clientClass = new Client(clientFd, getIndexClient(), *this, username, nickname);
+			// std::string username = getArg(std::string(reading), "USER ");
+			// std::string nickname = getArg(std::string(reading), "NICK ");
+			// if (username.empty() || nickname.empty())
+			// {
+			// 	close(clientFd);
+			// 	std::cout << "Invalid session tried to connect" << std::endl;
+			// 	continue;
+			// }
+			// std::cout << "-----" << clientFd << "-----" << reading << "----------" << std::endl;
+			clientClass = new Client(clientFd, getIndexClient(), *this);
 			clientClass->sendMessage(welcomeMessage);
 			createFd( clientFd );
 			clients[clientFd] = clientClass;

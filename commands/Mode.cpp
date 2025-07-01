@@ -63,6 +63,12 @@ int Mode::execute(const std::string &command, Client *cli) const
 	}
 
 	it++;
+	if (it == args.end())
+	{
+		oss << ":ircserv" << " 324 " << channelNeeded->getName() << " +" << channelNeeded->getMode();
+		cli->sendMessage(oss);
+		return 0;
+	}
 	// if an unknown char was found
 	for (int i = 0; (*it)[i] ;i++)
 	{
@@ -70,7 +76,7 @@ int Mode::execute(const std::string &command, Client *cli) const
 			mode = '+';
 		else if ((*it)[i] == '-')
 			mode = '-';
-		if ((*it)[i] == 'i')
+		else if ((*it)[i] == 'i')
 			iCommand(mode == '+', channelNeeded, cli);
 		else if ((*it)[i] == 'k')
 		{
@@ -102,8 +108,9 @@ int Mode::execute(const std::string &command, Client *cli) const
 			tCommand(mode == '+', channelNeeded, cli);
 		else if (!isalpha((*it)[i]))
 		{
+			std::cout << *it << std::endl;
 			cli->sendMessage("Unknown character");
-			return (0);
+			return (1);
 		}
 	}
 	return 1;
@@ -113,13 +120,12 @@ std::vector<std::string> Mode::getAllArgs(std::string &command) const
 {
 	std::vector<std::string> args;
 	std::string opt = "";
-	for (int x = 0; !command[x]; x++)
+	for (size_t x = 0; x < command.length(); x++)
 	{
-		for (; command[x] && command[x] != ' ' ; x++);
-		for (; command[x] && (command[x] != ',' && command[x] != ' ' && command[x] >= ' '); x++)
-		{
-			opt += command[x];
-		}
+		while (command[x] && command[x] == ' ')
+			x++;
+		while (command[x] && (command[x] != ',' && command[x] != ' ' && command[x] >= ' '))
+			opt += command[x++];
 		if (!opt.empty())
 			args.push_back(opt);
 		opt = "";

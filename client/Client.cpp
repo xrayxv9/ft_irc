@@ -2,11 +2,11 @@
 #include "../channel/Channel.hpp"
 #include <sstream>
 
-Client::Client( int fd, int index, Server &server, std::string &userName, std::string &nickName):
+Client::Client( int fd, int index, Server &server):
 	_server(server),
 	_clientFd(fd),
-	_nickName(nickName),
-	_userName(userName)
+	_nickName(""),
+	_userName("")
 {
 	_isRegistered = false;
 	std::ostringstream oss;
@@ -77,6 +77,7 @@ Channel *Client::joinChannel(const std::string &channelName, const std::string &
 		if (!channel->getPassword().empty() && channel->getPassword() != key)
 			return NULL;
 	}
+
 	this->_channels[channelName] = channel;
 	return channel;
 }
@@ -104,4 +105,14 @@ void Client::logIn()
 std::string Client::getUserName() const
 {
 	return this->_userName;
+}
+
+void Client::setNickName( std::string nickName )
+{
+	_nickName = nickName;
+}
+
+void Client::setUserName( std::string userName )
+{
+	_userName = userName;
 }

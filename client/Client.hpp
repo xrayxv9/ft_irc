@@ -19,7 +19,7 @@ class Client;
 class Client
 {
 	public:
-		Client( int fd, int index, Server &server, std::string &userName, std::string &nickName);
+		Client( int fd, int index, Server &server);
 		~Client();
 		Server &getServer();
 		int getFd() const;
@@ -32,6 +32,8 @@ class Client
 		int	isRegistered() const;
 		void logIn();
 		std::string generateMask();
+		void setNickName( std::string );
+		void setUserName( std::string );
 
 	private:
 		std::map<std::string, Channel *> _channels;
