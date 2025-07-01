@@ -61,7 +61,6 @@ class Channel
 		std::string _whoSetTopic;
 		std::string _whoSetTopicMask;
 		std::time_t _ts;
-		std::string _password;
 };
 
 #include "Channel.tpp"
