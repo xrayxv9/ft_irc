@@ -79,6 +79,7 @@ Channel *Client::joinChannel(const std::string &channelName, const std::string &
 		if (!channel->getPassword().empty() && channel->getPassword() != key)
 			return NULL;
 	}
+
 	this->_channels[channelName] = channel;
 	return channel;
 }
@@ -107,6 +108,16 @@ std::string Client::getUserName() const
 {
 	return this->_userName;
 }
+
+
+void Client::setNickName( std::string nickName )
+{
+	_nickName = nickName;
+}
+
+void Client::setUserName( std::string userName )
+{
+	_userName = userName;
 
 std::vector<std::string> &Client::getQueue()
 {

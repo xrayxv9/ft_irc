@@ -132,6 +132,7 @@ void Channel::setInviteOnly( bool inviteOnly, Client *client )
 	std::ostringstream oss;
 
 	oss << ":" << client->generateMask() << " MODE " << _channelName << " " << (inviteOnly ? "+" : "-") << "i";
+	setMode('i', inviteOnly, client);
 	client->sendMessage(oss);
 	_inviteOnly = inviteOnly;
 }
@@ -140,7 +141,8 @@ void Channel::restrictTopic( bool restrict, Client *cli )
 {
 	std::ostringstream oss;
 
-	oss << ":" << cli->generateMask() << " MODE " << _channelName << " " << (restrict ? "+" : "-") << "i";
+	oss << ":" << cli->generateMask() << " MODE " << _channelName << " " << (restrict? "+" : "-") << "t";
+	setMode('t', restrict, cli);
 	cli->sendMessage(oss);
 	_isAdminRestricted = restrict;
 }
@@ -149,10 +151,16 @@ void Channel::setPassword( std::string password, bool passwordBool, Client *cli 
 {
 	std::ostringstream oss;
 
-	oss << ":" << cli->generateMask() << " MODE " << _channelName << " " << (passwordBool ? "+" : "-") << "k";
-	cli->sendMessage(oss);
+	if (password.empty())
+	{
+		std::cout << "no password given" << std::endl;
+		return ;
+	}
+	oss << ":" << cli->generateMask() << " MODE " << _channelName << " " << (passwordBool? "+" : "-")<< "k " << password;
 	_password = password;
 	_isPasswordLimited = passwordBool;
+	setMode('k', passwordBool, cli);
+	cli->sendMessage(oss);
 }
 
 void Channel::setModo( Client *clientToMod, bool set, Client *cli )
@@ -169,6 +177,7 @@ void Channel::setModo( Client *clientToMod, bool set, Client *cli )
 		oss << ":" << cli->generateMask() << " MODE " << _channelName << " " << "-o";
 		_modoList.erase(isModo(clientToMod));
 	}
+	setMode('o', clientToMod, cli);
 	cli->sendMessage(oss);
 }
 
@@ -180,6 +189,47 @@ void Channel::setUserLimit( bool userLimitBool, int userLimit, Client *cli)
 		_userLimit = -1;
 	else
 		_userLimit = userLimit;		
-	oss << ":" << cli->generateMask() << " MODE " << _channelName << " " << (userLimitBool? "+" : "-") << "l";
+	setMode('l', userLimitBool, cli);
 	cli->sendMessage(oss);
+}
+
+void Channel::setMode( char letter, bool value, Client *cli)
+{
+	std::ostringstream oss;
+
+	if (value)
+	{
+		std::cout << "value positive" << std::endl;
+		if (_mode.find(letter) == std::string::npos)
+		{
+			std::cout << "ajout d'une lettre" << std::endl;
+			_mode += letter;
+		}
+	}
+	else
+	{
+		std::cout << "Value negative" << std::endl;
+		if (_mode.find(letter) != std::string::npos)
+		{
+			std::cout << "retrait d'une lettre " << std::endl;
+			_mode.erase(letter);
+		}
+	}
+	setTimeStamp();
+	std::cout << "mode : " << _mode << std::endl;
+	oss << ":" << cli->generateMask() << " MODE " << _channelName << " " << (value? "+" : "-") << "l";
+	cli->sendMessage(oss);
+	oss.clear();
+	oss << ":ircserv" << " 329 " << _channelName << " " << _tsMode;
+	cli->sendMessage(oss);
+}
+
+void Channel::setTimeStamp()
+{
+	std::time(&this->_tsMode);
+}
+
+time_t Channel::getTimeStamp()
+{
+	return _tsMode;
 }

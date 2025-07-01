@@ -5,6 +5,7 @@
 #include "PrivMSG.hpp"
 #include "Mode.hpp"
 #include "Topic.hpp"
+#include "User.hpp"
 #include "Who.hpp"
 #include <Join.hpp>
 #include <map>
@@ -50,13 +51,14 @@ Server::Server( int port , std::string passwd )
 	this->commands["PRIVMSG"] = new PrivMSG();
 	this->commands["NICK"] = new Nick();
 	this->commands["JOIN"] = new Join();
-	this->commands["pass"] = new Password();
+	this->commands["PASS"] = new Password();
 	this->commands["WHO"] = new Who();
 	this->commands["KICK"] = new Kick();
 	this->commands["MODE"] = new Mode();
 	this->commands["TOPIC"] = new Topic();
 	this->commands["INVITE"] = new Invite();
 	this->commands["NAMES"] = new Names();
+	this->commands["USER"] = new User();
 	success = 1;
 }
 
@@ -131,7 +133,7 @@ void Server::executeCommand()
 			if (client->updateQueue())
 			{
 				fds.erase(it);
-				continue ;
+        continue;
 			}
 			for (std::vector<std::string>::iterator it = client->getQueue().begin(); it != client->getQueue().end(); it++)
 			{
@@ -176,17 +178,6 @@ void Server::run()
 		if (fds.data()->revents & POLLIN)
 		{
 			clientFd = accept(this->socketFd, (sockaddr *)&client, &clientSize);
-			// recv(clientFd, reading, sizeof(reading), 0);
-			// std::string username = getArg(std::string(reading), "USER ");
-			// std::string nickname = getArg(std::string(reading), "NICK ");
-			// std::string password = getArg(std::string(reading), "PASS ");
-			// if (username.empty() || nickname.empty() || password.empty())
-			// {
-			// 	close(clientFd);
-			// 	std::cout << "Invalid session tried to connect" << std::endl;
-			// 	continue;
-			// }
-			std::cout << "-----" << clientFd << "---------------" << std::endl;
 			clientClass = new Client(clientFd, getIndexClient(), *this);
 			clientClass->sendMessage(welcomeMessage);
 			createFd( clientFd );

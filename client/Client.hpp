@@ -32,6 +32,8 @@ class Client
 		int	isRegistered() const;
 		void logIn();
 		std::string generateMask();
+		void setNickName( std::string );
+		void setUserName( std::string );
 		std::vector<std::string> &getQueue();
 		int updateQueue();
 

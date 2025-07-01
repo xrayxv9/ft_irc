@@ -20,7 +20,8 @@ SRC = main.cpp server/Server.cpp client/Client.cpp channel/Channel.cpp \
 	commands/Kick.cpp \
 	commands/Topic.cpp \
 	commands/Invite.cpp \
-	commands/Names.cpp
+	commands/Names.cpp \
+	commands/User.cpp
 
 OBJS_SRC = $(SRC:.cpp=.o)
 

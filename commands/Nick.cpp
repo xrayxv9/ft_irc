@@ -8,7 +8,6 @@ int Nick::execute(const std::string &command, Client *cli) const
 	std::map<int, Client *> clients = cli->getServer().getClients();
 	std::string nick;
 	int x = 5;
-	std::cout << "coucou" << std::endl;
 
 	for (;command[x] && command[x] == ' '; x++);
 
@@ -17,12 +16,12 @@ int Nick::execute(const std::string &command, Client *cli) const
 		std::cerr << cli->getNickName() << ": no nickname given " << std::endl;
 		return 0;
 	}
+
 	for (; command[x] && std::isalnum(command[x]); x++)
 	{
 		nick += command[x];
 	}
-	std::cout << command << std::endl;
-	std::cout << nick << std::endl;
+
 	if (command[x] != '\r' && !std::isalnum(command[x]))
 	{
 		std::cerr << cli->getNickName() << ": Erroneus Nickname" << std::endl;
@@ -42,7 +41,8 @@ int Nick::execute(const std::string &command, Client *cli) const
 
 	std::ostringstream oss;
 
-	oss <<  ':' << cli->getNickName() << "!realname@ircserv NICK :" << nick;
+	cli->setNickName(nick);
+	oss <<  ':' << cli->getUserName() << "!realname@ircserv NICK :" << nick;
 	cli->sendMessage(oss);
 	std::cout << "test" << std::endl;
 	return 1;
