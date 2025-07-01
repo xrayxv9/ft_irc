@@ -118,6 +118,7 @@ void Client::setNickName( std::string nickName )
 void Client::setUserName( std::string userName )
 {
 	_userName = userName;
+}
 
 std::vector<std::string> &Client::getQueue()
 {
