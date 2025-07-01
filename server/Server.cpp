@@ -52,7 +52,7 @@ Server::Server( int port , std::string passwd )
 	this->commands["NICK"] = new Nick();
 	this->commands["JOIN"] = new Join();
 	this->commands["PASS"] = new Password();
-	this->commands["WHO"] = new Who();
+	// this->commands["WHO"] = new Who();
 	this->commands["KICK"] = new Kick();
 	this->commands["MODE"] = new Mode();
 	this->commands["TOPIC"] = new Topic();
@@ -133,7 +133,10 @@ void Server::executeCommand()
 			if (client->updateQueue())
 			{
 				fds.erase(it);
-        continue;
+				this->clients.erase(it->fd);
+				delete client;
+				it--;
+        		continue;
 			}
 			for (std::vector<std::string>::iterator it = client->getQueue().begin(); it != client->getQueue().end(); it++)
 			{
@@ -174,6 +177,7 @@ void Server::run()
 	
 	while (g_running)
 	{
+		// std::cout << "Size is " <<  this->clients.size() << std::endl;
 		poll(fds.data(), fds.size(), 10);
 		if (fds.data()->revents & POLLIN)
 		{

@@ -48,7 +48,8 @@ class Channel
 		const std::string &whoSetTopicMask() const;
 		void setTopicMask(const std::string &);
 		const std::string &getPassword() const;
-
+		void removeClient(Client *);
+		
 	private :
 		bool _inviteOnly;
 		int _userLimit;

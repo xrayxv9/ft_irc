@@ -20,28 +20,23 @@ int User::execute(const std::string &command, Client *cli) const
 		nick += command[x];
 	std::cout << command << std::endl;
 	std::cout << nick << std::endl;
-	if (command[x] != '\r' && !std::isalnum(command[x]))
+	if (command[x] != '\r' && !std::isalnum(command[x]) && command[x] != ' ')
 	{
 		std::cerr << cli->getUserName() << ": Erroneus Username" << std::endl;
-		std::cout << "here is the char : " << std::endl;
-		std::cout << command[x] << "."<< std::endl;
 		return 0;
 	}
 
 	for (std::map<int, Client *>::iterator it = cli->getServer().getClients().begin(); it != cli->getServer().getClients().end(); it++)
 	{
+		std::cout << "Comparing '" << nick << "' to '" << it->second->getUserName() << '\'' << std::endl;
 		if (it->second->getUserName() == nick)
 		{
 			std::cerr << cli->getUserName() << ": nickname in use" << std::endl;
 			return 0;
 		}
 	}
-
 	std::ostringstream oss;
-
-
 	cli->setUserName(nick);
 	cli->sendMessage(oss);
-	std::cout << "test" << std::endl;
 	return 1;
 }
