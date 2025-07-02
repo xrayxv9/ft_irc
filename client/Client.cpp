@@ -1,5 +1,6 @@
 #include "Client.hpp"
 #include "../channel/Channel.hpp"
+#include <map>
 #include <sstream>
 #include <sys/poll.h>
 #include <sys/socket.h>
@@ -21,9 +22,9 @@ Client::Client( int fd, int index, Server &server):
 
 Client::~Client()
 {
-	std::string message;
 
-	send(this->_clientFd, message.c_str(), message.length(), 0);
+	for (std::map<std::string, Channel *>::iterator it = this->_channels.begin(); it != this->_channels.end(); it++)
+		it->second->removeClient(this);
 	close (this->_clientFd);
 }
 
@@ -96,7 +97,7 @@ std::string Client::getNickName() const
 
 int Client::isRegistered() const
 {
-	return _isRegistered;
+	return _isRegistered && !_userName.empty() && !_nickName.empty();
 }
 
 void Client::logIn()
@@ -129,31 +130,26 @@ int Client::updateQueue()
 {
 	char reading[1024];
 	int result = recv(this->_clientFd, reading, 1024, 0);
-	if (result)
+	if (result > 0)
 	{
 		std::vector<std::string> splitted = split(std::string(reading), '\n');
 		for (std::vector<std::string>::iterator it = splitted.begin(); it != splitted.end(); it++)
 		{
 			if ((*it)[(*it).size() - 1] == '\r')
 			{
-				std::cout << "Adding " << *it << std::endl;
 				this->_queue.push_back(this->_buff + *it);
 				this->_buff.clear();
 			}
 			else
 			{
 				this->_buff = *it;
-				std::cout << "Buffer is now " << this->_buff << std::endl;
 			}
 		}
-		std::cout << "At the end size is: " << _queue.size() << std::endl;
-
 	}
 	else
 	{
 		std::cout << "left" << std::endl;
-		this->_server.getClients().erase(this->_clientFd);
-		delete this;
+		// this->_server.getClients().erase(this->_clientFd);
 		return 1;
 	}
 	return 0;
