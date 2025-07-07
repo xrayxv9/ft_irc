@@ -43,8 +43,9 @@ int Invite::execute(const std::string &command, Client *cli) const
 	if (target->getChannels()[channelName] != NULL)
 	{
 		std::ostringstream oss;
-		oss << 443 << " " << target->getNickName() << " " << channelName << " :is already on channel";
+		oss << target->getNickName() << " " << channelName << " :is already on channel";
 		cli->sendMessage(oss);
+		return 0;
 	}
 	std::ostringstream targetMessage;
 	targetMessage << ":" << cli->generateMask() << " INVITE " << user << " :" << channelName;
