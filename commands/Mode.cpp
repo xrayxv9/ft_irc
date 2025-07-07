@@ -65,10 +65,12 @@ int Mode::execute(const std::string &command, Client *cli) const
 	it++;
 	if (it == args.end())
 	{
-		oss << ":ircserv" << " 324 " << channelNeeded->getName() << " +" << channelNeeded->getMode();
+		oss << ":127.0.0.1" << " 324 " << cli->getNickName() << " " << channelNeeded->getName() << (!channelNeeded->getMode().empty()? " +" : "") << channelNeeded->getMode();
+		std::cout << channelNeeded->getMode() << std::endl;
 		cli->sendMessage(oss);
 		return 0;
 	}
+	std::cout << "it : "<< *it << std::endl;
 	// if an unknown char was found
 	for (int i = 0; (*it)[i] ;i++)
 	{

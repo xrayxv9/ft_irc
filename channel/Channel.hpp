@@ -26,7 +26,7 @@ class Channel
 		void setPassword( std::string, bool, Client * );
 		void setModo( Client *, bool, Client * );
 		void setUserLimit( bool, int, Client * );
-		void setMode( char, bool, Client *);
+		void setMode( char, bool, Client *, std::string );
 		void setTimeStamp();
 
 		// getter
