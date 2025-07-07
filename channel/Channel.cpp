@@ -228,3 +228,13 @@ time_t Channel::getTimeStamp()
 {
 	return _tsMode;
 }
+
+void Channel::removeClient(Client *client)
+{
+	for (std::vector<Client *>::iterator it = this->_clientList.begin(); it != this->_clientList.end(); it ++)
+		if (*it == client)
+		{
+			this->_clientList.erase(it);
+			break;
+		}
+}
