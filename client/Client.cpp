@@ -141,9 +141,7 @@ int Client::updateQueue()
 				this->_buff.clear();
 			}
 			else
-			{
 				this->_buff = *it;
-			}
 		}
 	}
 	else

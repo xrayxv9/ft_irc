@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <iterator>
 #include <sstream>
+#include <string>
 #include <sys/socket.h>
 #include <vector>
 
@@ -129,11 +130,10 @@ std::vector<Client *>::iterator Channel::isModo( Client *cli )
 
 void Channel::setInviteOnly( bool inviteOnly, Client *client )
 {
+	std::cout << "is plus or minus : " << (inviteOnly? "+" : "-")<< std::endl;
 	std::ostringstream oss;
 
-	oss << ":" << client->generateMask() << " MODE " << _channelName << " " << (inviteOnly ? "+" : "-") << "i";
-	setMode('i', inviteOnly, client);
-	client->sendMessage(oss);
+	setMode('i', inviteOnly, client, "");
 	_inviteOnly = inviteOnly;
 }
 
@@ -141,9 +141,7 @@ void Channel::restrictTopic( bool restrict, Client *cli )
 {
 	std::ostringstream oss;
 
-	oss << ":" << cli->generateMask() << " MODE " << _channelName << " " << (restrict? "+" : "-") << "t";
-	setMode('t', restrict, cli);
-	cli->sendMessage(oss);
+	setMode('t', restrict, cli, "");
 	_isAdminRestricted = restrict;
 }
 
@@ -156,11 +154,9 @@ void Channel::setPassword( std::string password, bool passwordBool, Client *cli 
 		std::cout << "no password given" << std::endl;
 		return ;
 	}
-	oss << ":" << cli->generateMask() << " MODE " << _channelName << " " << (passwordBool? "+" : "-")<< "k " << password;
 	_password = password;
 	_isPasswordLimited = passwordBool;
-	setMode('k', passwordBool, cli);
-	cli->sendMessage(oss);
+	setMode('k', passwordBool, cli, password);
 }
 
 void Channel::setModo( Client *clientToMod, bool set, Client *cli )
@@ -177,26 +173,29 @@ void Channel::setModo( Client *clientToMod, bool set, Client *cli )
 		oss << ":" << cli->generateMask() << " MODE " << _channelName << " " << "-o";
 		_modoList.erase(isModo(clientToMod));
 	}
-	setMode('o', clientToMod, cli);
-	cli->sendMessage(oss);
+	setMode('o', clientToMod, cli, clientToMod->getUserName());
 }
 
 void Channel::setUserLimit( bool userLimitBool, int userLimit, Client *cli)
 {
 	std::ostringstream oss;
-
+	std::string number;
+	
+	oss << userLimit;
+	number = oss.str();
 	if (userLimitBool)
 		_userLimit = -1;
 	else
 		_userLimit = userLimit;		
-	setMode('l', userLimitBool, cli);
-	cli->sendMessage(oss);
+	setMode('l', userLimitBool, cli, number);
 }
 
-void Channel::setMode( char letter, bool value, Client *cli)
+void Channel::setMode( char letter, bool value, Client *cli, std::string options)
 {
 	std::ostringstream oss;
 
+	if (_mode.find(letter) != std::string::npos)
+		return ;
 	if (value)
 	{
 		std::cout << "value positive" << std::endl;
@@ -212,15 +211,11 @@ void Channel::setMode( char letter, bool value, Client *cli)
 		if (_mode.find(letter) != std::string::npos)
 		{
 			std::cout << "retrait d'une lettre " << std::endl;
-			_mode.erase(letter);
+			_mode.erase(_mode.find(letter));
 		}
 	}
-	setTimeStamp();
 	std::cout << "mode : " << _mode << std::endl;
-	oss << ":" << cli->generateMask() << " MODE " << _channelName << " " << (value? "+" : "-") << "l";
-	cli->sendMessage(oss);
-	oss.clear();
-	oss << ":ircserv" << " 329 " << _channelName << " " << _tsMode;
+	oss << ":" << cli->generateMask() << " MODE " << _channelName << " " << (value? "+" : "-") << letter << (!options.empty()? " " : "") << options;
 	cli->sendMessage(oss);
 }
 
