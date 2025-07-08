@@ -4,6 +4,7 @@
 #include "Names.hpp"
 #include "PrivMSG.hpp"
 #include "Mode.hpp"
+#include "Quit.hpp"
 #include "Topic.hpp"
 #include "User.hpp"
 #include "Who.hpp"
@@ -59,6 +60,7 @@ Server::Server( int port , std::string passwd )
 	this->commands["INVITE"] = new Invite();
 	this->commands["NAMES"] = new Names();
 	this->commands["USER"] = new User();
+	// this->commands["QUIT"] = new Quit();
 	success = 1;
 }
 
@@ -125,18 +127,20 @@ void Server::executeCommand()
 	std::string command;
 	// int commandFound= 0;
 
-	for (std::vector<pollfd>::iterator it = fds.begin(); it != fds.end(); it++)
+	for (std::vector<pollfd>::iterator fd = fds.begin(); fd != fds.end(); fd++)
 	{
-		if (it->revents & POLLIN && it.base() != fds.data())
+		if (fd->revents & POLLIN && fd.base() != fds.data())
 		{
-			Client *client = this->clients[it->fd];
+			Client *client = this->clients[fd->fd];
+			if (client == NULL)
+				continue ;
 			if (client->updateQueue())
 			{
-				fds.erase(it);
-				this->clients.erase(it->fd);
+				this->fds.erase(fd);
+				this->clients.erase(fd->fd);
 				delete client;
-				it--;
-        		continue;
+				fd--;
+        		continue ;
 			}
 			for (std::vector<std::string>::iterator it = client->getQueue().begin(); it != client->getQueue().end(); it++)
 			{
@@ -151,7 +155,15 @@ void Server::executeCommand()
 					std::cout << "Invalid command '" << command << '\'' << std::endl;
 					continue ;
 				}
-				if (client->isRegistered() || command == "USER" || command == "NICK" || command == "PASS")
+				if (command == "QUIT")
+				{
+					this->fds.erase(fd);
+					this->clients.erase(fd->fd);
+					delete client;
+					it--;
+					break;
+				}
+				else if (client->isRegistered() || command == "USER" || command == "NICK" || command == "PASS")
 					this->commands[command]->execute(*it, client);
 				else
 					client->sendMessage("You are not logged in, please use /pass <password>");
@@ -161,7 +173,7 @@ void Server::executeCommand()
 				std::cout << "___________________________________________________________" << std::endl;
 			}
 		}
-		it->revents = 0;
+		fd->revents = 0;
 	}
 }
 

@@ -147,7 +147,6 @@ int Client::updateQueue()
 	else
 	{
 		std::cout << "left" << std::endl;
-		// this->_server.getClients().erase(this->_clientFd);
 		return 1;
 	}
 	return 0;

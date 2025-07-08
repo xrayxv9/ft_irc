@@ -32,7 +32,7 @@ int Nick::execute(const std::string &command, Client *cli) const
 
 	for (std::map<int, Client *>::iterator it = cli->getServer().getClients().begin(); it != cli->getServer().getClients().end(); it++)
 	{
-		if (it->second->getNickName() == nick)
+		if (it->second != NULL && it->second->getNickName() == nick)
 		{
 			std::cerr << cli->getNickName() << ": nickname in use" << std::endl;
 			return 0;
