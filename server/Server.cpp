@@ -93,6 +93,7 @@ Server::~Server()
 {
 	for (std::map<int, Client *>::iterator it = clients.begin(); it != clients.end(); it++)
 		delete it->second;
+	clients.clear();
 	close(this->socketFd);
 	for (std::map<std::string, Command *>::iterator it = commands.begin(); it != commands.end(); it++)
 		delete it->second;
@@ -136,8 +137,8 @@ void Server::executeCommand()
 				continue ;
 			if (client->updateQueue())
 			{
+				this->clients.erase(this->clients.find(fd->fd));
 				this->fds.erase(fd);
-				this->clients.erase(fd->fd);
 				delete client;
 				fd--;
         		continue ;
@@ -157,8 +158,8 @@ void Server::executeCommand()
 				}
 				if (command == "QUIT")
 				{
+					this->clients.erase(this->clients.find(fd->fd));
 					this->fds.erase(fd);
-					this->clients.erase(fd->fd);
 					std::cout << "Remaining clients: " << this->clients.size() << std::endl;
 					delete client;
 					fd--;
