@@ -38,6 +38,7 @@ class Client
 		std::vector<std::string> &getQueue();
 		int updateQueue();
 		bool isMod(Channel *) const;
+		bool isInChannel(Channel *) const;
 
 	private:
 		std::map<std::string, Channel *> _channels;
