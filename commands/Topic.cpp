@@ -13,8 +13,6 @@ Topic::~Topic()
 
 }
 
-//TODO: Permission
-
 int Topic::execute(const std::string &command, Client *cli) const
 {
 	std::string channelName = getArg(command, this->getName() + ' ');

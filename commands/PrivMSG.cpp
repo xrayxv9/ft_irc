@@ -15,6 +15,13 @@ int PrivMSG::execute(const std::string &command, Client *cli) const
 {
 	std::cout << "----------" << cli->getFd() << "----------" << std::endl << command << std::endl << "---------------------" << std::endl;
 	Channel *channel = cli->getServer().getChannels()[getArg(command, "PRIVMSG ")];
+	if (!cli->isInChannel(channel))
+	{
+		std::ostringstream oss;
+		oss << cli->getUserName() << " " << channel->getName() << " :Cannot send to channel";
+		cli->sendMessage(oss);
+		return 0;
+	}
 	for (std::vector<Client *>::iterator it = channel->getClients().begin(); it != channel->getClients().end(); it++)
 	{
 		Client *user = *it;
