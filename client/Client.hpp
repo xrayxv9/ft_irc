@@ -15,6 +15,7 @@ enum rank
 
 class Server;
 class Client;
+class Channel;
 
 class Client
 {
@@ -36,6 +37,8 @@ class Client
 		void setUserName( std::string );
 		std::vector<std::string> &getQueue();
 		int updateQueue();
+		bool isMod(Channel *) const;
+		bool isInChannel(Channel *) const;
 
 	private:
 		std::map<std::string, Channel *> _channels;

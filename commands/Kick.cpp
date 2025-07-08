@@ -12,8 +12,6 @@ Kick::Kick(): Command("KICK", "kick a user fron a channel")
 Kick::~Kick()
 {}
 
-//TODO: Channel permission
-
 int Kick::execute(const std::string &command, Client *cli) const
 {
 	(void)command;
@@ -56,6 +54,13 @@ int Kick::execute(const std::string &command, Client *cli) const
 	{
 		std::ostringstream oss;
 		oss << cli->getFd() << " " << channelName << " :You're not on that channel";
+		cli->sendMessage(oss);
+		return 0;
+	}
+	if (!cli->isMod(channel))
+	{
+		std::ostringstream oss;
+		oss << ":ircserv 482 " << cli->getUserName() << " " << channelName << " :You're not a channel operator";
 		cli->sendMessage(oss);
 		return 0;
 	}

@@ -13,8 +13,6 @@ Topic::~Topic()
 
 }
 
-//TODO: Permission
-
 int Topic::execute(const std::string &command, Client *cli) const
 {
 	std::string channelName = getArg(command, this->getName() + ' ');
@@ -59,12 +57,19 @@ int Topic::execute(const std::string &command, Client *cli) const
 		cli->sendMessage(oss2);
 		return 1;
 	}
+	if (!cli->isMod(channel))
+	{
+		std::ostringstream oss;
+		oss << ":ircserv 482 " << cli->getUserName() << " " << channelName << " :You're not a channel operator";
+		cli->sendMessage(oss);
+		return 0;
+	}
 	channel->setTopic(topic, cli->getUserName());
 	channel->setTopicMask(cli->generateMask());
 	for (std::vector<Client *>::iterator it = channel->getClients().begin(); it != channel->getClients().end(); it++)
 	{
 		std::ostringstream oss;
-		oss << ":" << (*it)->generateMask() << " TOPIC " << channelName << " :" << topic;
+		oss << ":" << cli->generateMask() << " TOPIC " << channelName << " :" << topic;
 		(*it)->sendMessage(oss);
 	}
 	return 1;

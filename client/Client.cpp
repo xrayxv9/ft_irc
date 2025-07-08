@@ -154,3 +154,25 @@ int Client::updateQueue()
 	}
 	return 0;
 }
+
+
+bool Client::isMod(Channel *channel) const
+{
+	for (std::vector<Client *>::iterator it = channel->getModo().begin(); it != channel->getModo().end(); it++)
+	{
+		if (*it == this)
+			return true;
+	}
+	return false;
+}
+
+bool Client::isInChannel(Channel *channel) const
+{
+	for (std::vector<Client *>::iterator it = channel->getClients().begin(); it != channel->getClients().end(); it++)
+	{
+		if (*it == this)
+			return true;
+	}
+	return false;
+}
+
