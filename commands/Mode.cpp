@@ -65,7 +65,7 @@ int Mode::execute(const std::string &command, Client *cli) const
 	it++;
 	if (it == args.end())
 	{
-		oss << ":127.0.0.1" << " 324 " << cli->getNickName() << " " << channelNeeded->getName() << (!channelNeeded->getMode().empty()? " +" : "") << channelNeeded->getMode();
+		oss << ":ircserv" << " 324 " << cli->getNickName() << " " << channelNeeded->getName() << (!channelNeeded->getMode().empty()? " +" : "") << channelNeeded->getMode();
 		std::cout << channelNeeded->getMode() << std::endl;
 		cli->sendMessage(oss);
 		return 0;
@@ -79,16 +79,24 @@ int Mode::execute(const std::string &command, Client *cli) const
 		else if ((*it)[i] == '-')
 			mode = '-';
 		else if ((*it)[i] == 'i')
+		{
 			iCommand(mode == '+', channelNeeded, cli);
+		}
 		else if ((*it)[i] == 'k')
 		{
-			if (args.size() > iter)
+			if (args.size() > iter + 1)
 				kCommand(*(it + iter++), mode == '+', channelNeeded, cli);
 		}
 		else if ((*it)[i] == 'l')
 		{
-			// TODO ADD THE VERIF FOR THE INTS HERE !
-			lCommand(1, mode == '+', channelNeeded, cli);
+			int num = 1;
+			if ((args.size() > iter + 1 && mode == '+'))
+			{
+				if ((*(it + iter )).length() > 2)
+					return 0;
+				num = std::atoi((*(it + iter++)).c_str());
+			}
+			lCommand(num, mode == '+', channelNeeded, cli);
 		}
 		else if ((*it)[i] == 'o')
 		{
@@ -101,10 +109,9 @@ int Mode::execute(const std::string &command, Client *cli) const
 					if (*(it + iter) == (*at)->getNickName())
 						break;
 				}
-				oCommand(mode == '+', channelNeeded, *at, cli);
+				if (at != clients.end())
+					oCommand(mode == '+', channelNeeded, *at, cli);
 			}
-			oss << ":" << cli->generateMask() << " :No such nick/channel";
-			cli->sendMessage(oss);
 		}
 		else if ((*it)[i] == 't')
 			tCommand(mode == '+', channelNeeded, cli);

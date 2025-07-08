@@ -28,8 +28,7 @@ int User::execute(const std::string &command, Client *cli) const
 
 	for (std::map<int, Client *>::iterator it = cli->getServer().getClients().begin(); it != cli->getServer().getClients().end(); it++)
 	{
-		std::cout << "Comparing '" << nick << "' to '" << it->second->getUserName() << '\'' << std::endl;
-		if (it->second->getUserName() == nick)
+		if (it->second && it->second->getUserName() == nick)
 		{
 			std::cerr << cli->getUserName() << ": nickname in use" << std::endl;
 			return 0;

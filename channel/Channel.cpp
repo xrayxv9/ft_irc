@@ -7,14 +7,23 @@
 #include <sys/socket.h>
 #include <vector>
 
-Channel::Channel(std::string channelName, std::string password): _channelName(channelName), _password(password) {}
+Channel::Channel(std::string channelName, std::string password):
+	_inviteOnly(false),
+	_isAdminRestricted(true),
+	_isPasswordLimited(false),
+	_mode(""),
+	_channelName(channelName),
+	_password(password)
+{}
 
-Channel::Channel(std::string channelName, std::string password, Client *client): _channelName(channelName), _password(password)
+Channel::Channel(std::string channelName, std::string password, Client *client):
+	_inviteOnly(false),
+	_isAdminRestricted(true),
+	_isPasswordLimited(false),
+	_mode(""),
+	_channelName(channelName),
+	_password(password)
 {
-	_mode = "";
-	_isPasswordLimited = false;
-	_inviteOnly = false;
-	_isAdminRestricted = true;
 	_clientList.push_back(client);
 	std::cout << "Creating channel with " << channelName << std::endl;
 }
@@ -154,6 +163,11 @@ void Channel::setPassword( std::string password, bool passwordBool, Client *cli 
 		std::cout << "no password given" << std::endl;
 		return ;
 	}
+	if (_isPasswordLimited && !passwordBool && password != _password )
+	{
+		std::cout << "Incorrect passwd" << std::endl;
+		return ;
+	}
 	_password = password;
 	_isPasswordLimited = passwordBool;
 	setMode('k', passwordBool, cli, password);
@@ -173,7 +187,7 @@ void Channel::setModo( Client *clientToMod, bool set, Client *cli )
 		oss << ":" << cli->generateMask() << " MODE " << _channelName << " " << "-o";
 		_modoList.erase(isModo(clientToMod));
 	}
-	setMode('o', clientToMod, cli, clientToMod->getUserName());
+	setMode('o', set, cli, clientToMod->getUserName());
 }
 
 void Channel::setUserLimit( bool userLimitBool, int userLimit, Client *cli)
@@ -189,30 +203,46 @@ void Channel::setUserLimit( bool userLimitBool, int userLimit, Client *cli)
 		_userLimit = userLimit;		
 	setMode('l', userLimitBool, cli, number);
 }
-
+bool findLetter(char c, std::string str)
+{
+	for (int i = 0; str[i]; i++)
+	{
+		if (str[i] == c)
+			return true;
+	}
+	return false;
+}
 void Channel::setMode( char letter, bool value, Client *cli, std::string options)
 {
 	std::ostringstream oss;
 
-	if (_mode.find(letter) != std::string::npos)
-		return ;
 	if (value)
 	{
 		std::cout << "value positive" << std::endl;
-		if (_mode.find(letter) == std::string::npos)
+		if (!findLetter(letter, this->_mode) || letter == 'l')
 		{
 			std::cout << "ajout d'une lettre" << std::endl;
 			_mode += letter;
 		}
+		else
+			return ;
 	}
 	else
 	{
+		bool valid = false;
 		std::cout << "Value negative" << std::endl;
-		if (_mode.find(letter) != std::string::npos)
+		for (int i = 0; _mode[i]; i++)
 		{
-			std::cout << "retrait d'une lettre " << std::endl;
-			_mode.erase(_mode.find(letter));
+			if (_mode[i] == letter)
+			{
+				valid = true;
+				std::cout << "retrait d'une lettre " << std::endl;
+				_mode.erase(_mode.find(letter));
+				break ;
+			}
 		}
+		if (!valid)
+			return ;
 	}
 	std::cout << "mode : " << _mode << std::endl;
 	oss << ":" << cli->generateMask() << " MODE " << _channelName << " " << (value? "+" : "-") << letter << (!options.empty()? " " : "") << options;
