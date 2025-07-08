@@ -154,9 +154,8 @@ void Server::executeCommand()
 				{
 					//Invalid command
 					std::cout << "Invalid command '" << command << '\'' << std::endl;
-					continue ;
 				}
-				if (command == "QUIT")
+				else if (command == "QUIT")
 				{
 					this->clients.erase(this->clients.find(fd->fd));
 					this->fds.erase(fd);
@@ -170,6 +169,7 @@ void Server::executeCommand()
 				else
 					client->sendMessage("You are not logged in, please use /pass <password>");
 				client->getQueue().erase(it);
+				std::cout << "There are now " << client->getQueue().size() << " waiting commands to be executed for " <<client->getUserName() << std::endl;
 				it--;
 				// std::cout << "Reading is: " << command << std::endl;
 				std::cout << "___________________________________________________________" << std::endl;
