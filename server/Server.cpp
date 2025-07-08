@@ -149,7 +149,7 @@ void Server::executeCommand()
 				for (int x = 0; (*it)[x] != '\0' && (*it)[x] != ' ' && (*it)[x] != '\r' && (*it)[x] != '\n'; x++)
 					command += (*it)[x];
 				std::cout << "Searching command '" << command << '\'' << std::endl;
-				if (this->commands[command] == NULL)
+				if (this->commands[command] == NULL && command != "QUIT")
 				{
 					//Invalid command
 					std::cout << "Invalid command '" << command << '\'' << std::endl;
@@ -159,8 +159,9 @@ void Server::executeCommand()
 				{
 					this->fds.erase(fd);
 					this->clients.erase(fd->fd);
+					std::cout << "Remaining clients: " << this->clients.size() << std::endl;
 					delete client;
-					it--;
+					fd--;
 					break;
 				}
 				else if (client->isRegistered() || command == "USER" || command == "NICK" || command == "PASS")
@@ -199,6 +200,7 @@ void Server::run()
 			createFd( clientFd );
 			clients[clientFd] = clientClass;
 			fds.data()->revents = 0;
+			std::cout << "---- New client joined with fd " << clientFd << " ----" << std::endl;
 		}
 		else
 		{

@@ -22,9 +22,12 @@ Client::Client( int fd, int index, Server &server):
 
 Client::~Client()
 {
-
+	std::cout << "Deleting client " << this->_userName << std::endl;
 	for (std::map<std::string, Channel *>::iterator it = this->_channels.begin(); it != this->_channels.end(); it++)
+	{
 		it->second->removeClient(this);
+		std::cout << "		- Removing from channel " << it->second->getName() << std::endl;
+	}
 	close (this->_clientFd);
 }
 
