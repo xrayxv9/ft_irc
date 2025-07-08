@@ -154,9 +154,8 @@ void Server::executeCommand()
 				{
 					//Invalid command
 					std::cout << "Invalid command '" << command << '\'' << std::endl;
-					continue ;
 				}
-				if (command == "QUIT")
+				else if (command == "QUIT")
 				{
 					this->clients.erase(this->clients.find(fd->fd));
 					this->fds.erase(fd);

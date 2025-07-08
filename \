@@ -68,24 +68,23 @@ void Client::sendMessage(std::string str)
 Channel *Client::joinChannel(const std::string &channelName, const std::string &key)
 {
 	std::ostringstream oss;
+	oss << ':' << this->generateMask() << " JOIN :" << channelName;
+	this->sendMessage(oss);
 	Channel *channel;  
 	if (this->_server.getChannels().find(channelName) == this->_server.getChannels().end())
 	{
 		channel = new Channel(channelName, key);
 		this->_server.getChannels()[channelName] = channel;
 		channel->getModo().push_back(this);
-		std::cout << "create a channel" << std::endl;
 	}
 	else
 	{
 		channel = this->_server.getChannels()[channelName];
-		std::cout << std::endl << std::endl <<  "__________________________________" << std::endl << std::endl;
-		std::cout << "cond : " << (channel->getMode().find('i') != std::string::npos) << std::endl;
-		if (channel->getMode().find('i') != std::string::npos)
+		if (channel.getMode().find('i') == std::string::npos)
 		{
-			std::cout << "coucou" << std::endl;
+			std::cout << "+i mode, couldn't join" << std::endl;
 			oss.clear();
-			oss << "Cannot join channel - you must be invited";
+			oss << "473 " << _nickName << " " << channelName << " :Cannot join channel (+i) - you must be invited";
 			sendMessage(oss);
 			return NULL;
 		}
@@ -93,8 +92,6 @@ Channel *Client::joinChannel(const std::string &channelName, const std::string &
 			return NULL;
 	}
 
-	oss << ':' << this->generateMask() << " JOIN :" << channelName;
-	this->sendMessage(oss);
 	this->_channels[channelName] = channel;
 	return channel;
 }
