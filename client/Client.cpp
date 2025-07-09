@@ -80,7 +80,6 @@ Channel *Client::joinChannel(const std::string &channelName, const std::string &
 	{
 		channel = this->_server.getChannels()[channelName];
 		std::cout << std::endl << std::endl <<  "__________________________________" << std::endl << std::endl;
-		std::cout << "cond : " << (channel->getMode().find('i') != std::string::npos) << std::endl;
 		if (channel->getMode().find('k') != std::string::npos && key != channel->getPassword())
 		{
 			std::cout << "password : " << channel->getPassword() << " try : " << key << std::endl;
