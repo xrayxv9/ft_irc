@@ -25,8 +25,8 @@ int Topic::execute(const std::string &command, Client *cli) const
         cli->sendMessage(oss);
         return 0;
 	}
-	Channel *channel = cli->getServer().getChannels()[channelName];
-    if (channel == NULL)
+	std::map<std::string, Channel *>::iterator it = cli->getServer().getChannels().find(channelName);
+    if (it == cli->getServer().getChannels().end())
     {
         std::ostringstream oss;
         oss << ":ircserv " << 403 << " " << channelName << " :No such channel";
@@ -40,6 +40,7 @@ int Topic::execute(const std::string &command, Client *cli) const
         cli->sendMessage(oss);
         return 0;
     }
+	Channel *channel = it->second;
 	if (channel->getTopic().empty() && topic.empty())
 	{
 		std::ostringstream oss;
@@ -60,7 +61,7 @@ int Topic::execute(const std::string &command, Client *cli) const
 	if (channel->isTopicRestricted() && !cli->isMod(channel))
 	{
 		std::ostringstream oss;
-		oss << ":ircserv 482 " << cli->getUserName() << " " << channelName << " :You're not a channel operator";
+		oss << ":ircserv 482 " << channelName << " :You're not a channel operator";
 		cli->sendMessage(oss);
 		return 0;
 	}
