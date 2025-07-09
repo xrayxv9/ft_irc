@@ -19,7 +19,7 @@ void sendUsers(Client *cli, Channel *channel)
 	for (std::vector<Client *>::iterator it = channel->getClients().begin(); it != channel->getClients().end(); it++)
 	{
 		std::ostringstream oss;
-		oss << ":ircserv 353 " << cli->getUserName() << " @ " << channel->getName() << " :@" << (*it)->getUserName();
+		oss << ":ircserv 353 " << cli->getNickName() << " @ " << channel->getName() << " :" << ((*it)->isMod(channel) ? "@" : "") << (*it)->getNickName();
 		cli->sendMessage(oss);
 	}
 	std::ostringstream oss;
