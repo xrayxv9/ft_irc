@@ -103,10 +103,9 @@ Channel *Client::joinChannel(const std::string &channelName, const std::string &
 			}
 			if (!found)
 			{
-				std::cout << "coucou" << std::endl;
 				oss.clear();
-				oss << "Cannot join channel - you must be invited";
-				sendMessage(oss);
+				oss << ":ircserv 473 " << this->getNickName() << " " << channelName << " :Cannot join channel (+i)";
+				this->sendMessage(oss);
 				return NULL;
 			}
 		}
