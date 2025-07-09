@@ -100,7 +100,7 @@ int Mode::execute(const std::string &command, Client *cli) const
 		}
 		else if ((*it)[i] == 'o')
 		{
-			if (args.size() > iter)
+			if (args.size() > iter + 1)
 			{
 				std::vector<Client *> clients = channelNeeded->getClients();
 				std::vector<Client *>::iterator at = clients.begin();

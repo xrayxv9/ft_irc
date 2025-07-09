@@ -21,14 +21,14 @@ void joinChannel(Client *cli, const std::string &name, const std::string &pass)
 		return ;
 	}
 	std::cout << "Name: " << name << " Password: " << pass << std::endl;
-	Channel * channel = cli->joinChannel(name, pass);
+	Channel *channel = cli->joinChannel(name, pass);
 
 
 	if (channel == NULL)
 	{
-		//TODO: Send error
 		return ;
 	}
+	std::cout << "coucou je passe ici" << std::endl << std::endl <<std::endl;
 	channel->getClients().push_back(cli);
 }
 

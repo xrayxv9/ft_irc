@@ -36,6 +36,7 @@ class Channel
 		std::string &getMode();
 		std::vector<Client *> &getClients();
 		std::vector<Client *> &getModo();
+		std::vector<Client *> &getInvited();
 		int getUserLimit();
 		std::vector<Client *>::iterator isModo( Client * );
 		time_t getTimeStamp();
@@ -60,6 +61,7 @@ class Channel
 		std::string _password;
 		std::vector<Client *> _clientList;
 		std::vector<Client *> _modoList;
+		std::vector<Client *> _invitedList;
 		std::string _topic;
 		std::string _whoSetTopic;
 		std::string _whoSetTopicMask;

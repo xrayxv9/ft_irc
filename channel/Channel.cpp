@@ -269,3 +269,8 @@ void Channel::removeClient(Client *client)
 			break;
 		}
 }
+
+std::vector<Client *> &Channel::getInvited()
+{
+	return this->_invitedList;
+}

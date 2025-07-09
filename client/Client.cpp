@@ -68,22 +68,55 @@ void Client::sendMessage(std::string str)
 Channel *Client::joinChannel(const std::string &channelName, const std::string &key)
 {
 	std::ostringstream oss;
-	oss << ':' << this->generateMask() << " JOIN :" << channelName;
-	this->sendMessage(oss);
 	Channel *channel;  
 	if (this->_server.getChannels().find(channelName) == this->_server.getChannels().end())
 	{
 		channel = new Channel(channelName, key);
 		this->_server.getChannels()[channelName] = channel;
 		channel->getModo().push_back(this);
+		std::cout << "create a channel" << std::endl;
 	}
 	else
 	{
 		channel = this->_server.getChannels()[channelName];
+		std::cout << std::endl << std::endl <<  "__________________________________" << std::endl << std::endl;
+		std::cout << "cond : " << (channel->getMode().find('i') != std::string::npos) << std::endl;
+		if (channel->getMode().find('k') != std::string::npos && key != channel->getPassword())
+		{
+			std::cout << "password : " << channel->getPassword() << " try : " << key << std::endl;
+			oss.clear();
+			oss << "Wrong Password";
+			sendMessage(oss);
+			return NULL;
+		}
+		if (channel->getMode().find('i') != std::string::npos)
+		{
+			bool found = false;
+			std::vector<Client *> clients = channel->getInvited();
+			for (std::vector<Client *>::iterator it = clients.begin(); it != clients.end(); it++)
+			{
+				if ((*it)->getUserName() == this->_userName)
+				{
+					found = true;
+					clients.erase(it);
+					break;
+				}
+			}
+			if (!found)
+			{
+				std::cout << "coucou" << std::endl;
+				oss.clear();
+				oss << "Cannot join channel - you must be invited";
+				sendMessage(oss);
+				return NULL;
+			}
+		}
 		if (!channel->getPassword().empty() && channel->getPassword() != key)
 			return NULL;
 	}
 
+	oss << ':' << this->generateMask() << " JOIN :" << channelName;
+	this->sendMessage(oss);
 	this->_channels[channelName] = channel;
 	return channel;
 }
