@@ -9,21 +9,24 @@
 
 Channel::Channel(std::string channelName, std::string password):
 	_inviteOnly(false),
-	_isAdminRestricted(true),
-	_isPasswordLimited(false),
-	_mode(""),
-	_channelName(channelName),
-	_password(password)
-{}
-
-Channel::Channel(std::string channelName, std::string password, Client *client):
-	_inviteOnly(false),
-	_isAdminRestricted(true),
+	_isTopicRestricted(true),
 	_isPasswordLimited(false),
 	_mode(""),
 	_channelName(channelName),
 	_password(password)
 {
+	_mode += 't';
+}
+
+Channel::Channel(std::string channelName, std::string password, Client *client):
+	_inviteOnly(false),
+	_isTopicRestricted(true),
+	_isPasswordLimited(false),
+	_mode(""),
+	_channelName(channelName),
+	_password(password)
+{
+	_mode += 't';
 	_clientList.push_back(client);
 	std::cout << "Creating channel with " << channelName << std::endl;
 }
@@ -105,9 +108,9 @@ std::string &Channel::getMode()
 	return _mode;
 }
 
-bool Channel::isRestricted()
+bool Channel::isTopicRestricted()
 {
-	return _isAdminRestricted;
+	return _isTopicRestricted;
 }
 
 bool Channel::isInviteOnly()
@@ -135,8 +138,6 @@ std::vector<Client *>::iterator Channel::isModo( Client *cli )
 	return _modoList.end();
 }
 
-// set
-
 void Channel::setInviteOnly( bool inviteOnly, Client *client )
 {
 	std::cout << "is plus or minus : " << (inviteOnly? "+" : "-")<< std::endl;
@@ -150,8 +151,8 @@ void Channel::restrictTopic( bool restrict, Client *cli )
 {
 	std::ostringstream oss;
 
-	setMode('t', restrict, cli, "");
-	_isAdminRestricted = restrict;
+	this->setMode('t', restrict, cli, "");
+	_isTopicRestricted = restrict;
 }
 
 void Channel::setPassword( std::string password, bool passwordBool, Client *cli )
