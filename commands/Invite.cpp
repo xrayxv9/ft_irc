@@ -53,5 +53,6 @@ int Invite::execute(const std::string &command, Client *cli) const
 	std::ostringstream senderMessage;
 	senderMessage << ":ircserv 341 " << cli->getUserName() << " " << user << " " << channelName;
 	target->sendMessage(targetMessage);	
+	channel->getInvited().push_back(target);
 	return 1;
 }
