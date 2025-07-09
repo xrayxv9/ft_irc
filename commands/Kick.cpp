@@ -23,15 +23,15 @@ int Kick::execute(const std::string &command, Client *cli) const
 	if (channelName.empty() || user.empty())
 	{
 		std::ostringstream oss;
-		oss << cli->getFd() << " " << this->getName() << " :Not enough parameters";
+		oss << ":ircserv 461 " << cli->getUserName() << " " << this->getName() << " :Not enough parameters";
 		cli->sendMessage(oss);
 		return 0;
 	}
-	Channel *channel = cli->getServer().getChannels()[channelName];
-	if (channel == NULL)
+	std::map<std::string, Channel *>::iterator channel = cli->getServer().getChannels().find(channelName);
+	if (channel == cli->getServer().getChannels().end())
 	{
 		std::ostringstream oss;
-		oss << cli->getFd() << " " << channelName << " :No such channel";
+		oss << ":ircserv 403 " << cli->getUserName() << " " << channelName << " :No such Channel";
 		cli->sendMessage(oss);
 		return 0;
 	}
@@ -39,29 +39,29 @@ int Kick::execute(const std::string &command, Client *cli) const
 	if (target == NULL)
 	{
 		std::ostringstream oss;
-		oss << cli->getFd() << " " << user << " " << channelName << " :They aren't on that channel";
+		oss << ": 441 " << cli->getNickName() << " " << user << " " << channelName << " :They aren't on that channel";
 		cli->sendMessage(oss);
 		return 0;
 	}
-	std::vector<Client *>::iterator it = std::find(channel->getClients().begin(), channel->getClients().end(), target);
-	if (it == channel->getClients().end())
+	std::vector<Client *>::iterator it = std::find(channel->second->getClients().begin(), channel->second->getClients().end(), target);
+	if (it == channel->second->getClients().end())
 	{
 		std::ostringstream oss;
-		oss << cli->getFd() << " " << user << " " << channelName << " :They aren't on that channel";
+		oss << ": 441 " << cli->getNickName() << " " << user << " " << channelName << " :They aren't on that channel";
 		cli->sendMessage(oss);
 		return 0;
 	}
 	if (cli->getChannels()[channelName] == NULL)
 	{
 		std::ostringstream oss;
-		oss << cli->getFd() << " " << channelName << " :You're not on that channel";
+		oss << ": 442 " << cli->getNickName() << " " << channelName << " :You're not on that channel";
 		cli->sendMessage(oss);
 		return 0;
 	}
-	if (!cli->isMod(channel))
+	if (!cli->isMod(channel->second))
 	{
 		std::ostringstream oss;
-		oss << ":ircserv 482 " << cli->getUserName() << " " << channelName << " :You're not a channel operator";
+		oss << ": 482 " << cli->getUserName() << " " << channelName << " :You're not a channel operator";
 		cli->sendMessage(oss);
 		return 0;
 	}
@@ -74,6 +74,6 @@ int Kick::execute(const std::string &command, Client *cli) const
 		oss << target->getNickName();
 	for (std::vector<Client *>::iterator it = channel->getClients().begin(); it != channel->getClients().end(); it++)
 		(*it)->sendMessage(oss);
-	channel->kick(it);
+	channel->second->kick(it);
 	return 1;
 }

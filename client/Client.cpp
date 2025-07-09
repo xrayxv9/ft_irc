@@ -7,13 +7,11 @@
 #include <vector>
 #include <main.hpp>
 
-Client::Client( int fd, int index, Server &server):
+Client::Client( int fd, Server &server):
 	_server(server),
 	_clientFd(fd)
 {
-	(void)index;
 	_isRegistered = false;
-	std::ostringstream oss;
 
 	this->_rank = USER;
 }
@@ -76,11 +74,10 @@ Channel *Client::joinChannel(const std::string &channelName, const std::string &
 	else
 	{
 		channel = this->_server.getChannels()[channelName];
-		std::cout << std::endl << std::endl <<  "__________________________________" << std::endl << std::endl;
 		if (channel->getMode().find('k') != std::string::npos && key != channel->getPassword())
 		{
 			oss.clear();
-			oss << ":ircserv 475 " << this->getNickName() << " " << channelName << " :Cannot join channel (+k)";
+			oss << "475 " << _userName << " " << channelName << " :Cannot join channel (+k)";
 			sendMessage(oss);
 			return NULL;
 		}
@@ -100,8 +97,8 @@ Channel *Client::joinChannel(const std::string &channelName, const std::string &
 			if (!found)
 			{
 				oss.clear();
-				oss << ":ircserv 473 " << this->getNickName() << " " << channelName << " :Cannot join channel (+i)";
-				this->sendMessage(oss);
+				oss << ":ircserv 473 " << _userName << " " << channelName << " :Cannot join channel (+i)";
+				sendMessage(oss);
 				return NULL;
 			}
 		}

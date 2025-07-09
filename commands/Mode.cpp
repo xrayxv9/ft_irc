@@ -40,12 +40,8 @@ int Mode::execute(const std::string &command, Client *cli) const
 	}
 	if (!channelNeeded)
 	{
-		cli->sendMessage("The channel doesn't exist");
-		return 0;
-	}
-	if (!isAdmin && channelNeeded->isTopicRestricted())
-	{
-		cli->sendMessage("You are not an admin");
+		oss << ":ircserv 403 " << cli->getNickName() << " " << channelName << " :No such channel"; 
+		cli->sendMessage(oss);
 		return 0;
 	}
 
@@ -57,8 +53,14 @@ int Mode::execute(const std::string &command, Client *cli) const
 		cli->sendMessage(oss);
 		return 0;
 	}
+
+	if (!isAdmin && channelNeeded->isTopicRestricted())
+	{
+		oss << ":ircserv 482 " << cli->getNickName() << " " << channelName << " :You're not a channel operator"; 
+		cli->sendMessage(oss);
+		return 0;
+	}
 	std::cout << "it : "<< *it << std::endl;
-	// if an unknown char was found
 	for (int i = 0; (*it)[i] ;i++)
 	{
 		if ((*it)[i] == '+')
@@ -66,9 +68,7 @@ int Mode::execute(const std::string &command, Client *cli) const
 		else if ((*it)[i] == '-')
 			mode = '-';
 		else if ((*it)[i] == 'i')
-		{
 			iCommand(mode == '+', channelNeeded, cli);
-		}
 		else if ((*it)[i] == 'k')
 		{
 			if (args.size() > iter + 1)
@@ -104,8 +104,8 @@ int Mode::execute(const std::string &command, Client *cli) const
 			tCommand(mode == '+', channelNeeded, cli);
 		else if (!isalpha((*it)[i]))
 		{
-			std::cout << *it << std::endl;
-			cli->sendMessage("Unknown character");
+			oss << ":ircserv 472 " << cli->getNickName() << " " << ((*it)[i]) << ":is an unknown char to me";
+			cli->sendMessage(oss);
 			return (1);
 		}
 	}
