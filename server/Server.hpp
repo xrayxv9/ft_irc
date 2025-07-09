@@ -37,7 +37,6 @@ class Server
 		int	getFd();
 		std::map<std::string, Channel *> &getChannels();
 		int	getStatus();
-		int getIndexClient();
 		void executeCommand();
 		std::string getPasswd();
 		std::map<int, Client *> &getClients();

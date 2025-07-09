@@ -101,14 +101,6 @@ Server::~Server()
 	std::cout << "server closed" << std::endl;
 }
 
-int Server::getIndexClient()
-{
-	int i = 0;
-	for (std::map<int, Client *>::iterator it = clients.begin(); it != clients.end(); it++)
-		i++;
-	return (i);
-}
-
 std::string getArg(std::string input, std::string toFind, bool skipSpace)
 {
 	int where = input.find(toFind);
@@ -123,9 +115,7 @@ std::string getArg(std::string input, std::string toFind, bool skipSpace)
 
 void Server::executeCommand()
 {
-	// char reading[1024] = {0};
 	std::string command;
-	// int commandFound= 0;
 
 	for (std::vector<pollfd>::iterator fd = fds.begin(); fd != fds.end(); fd++)
 	{
@@ -192,7 +182,7 @@ void Server::run()
 		if (fds.data()->revents & POLLIN)
 		{
 			clientFd = accept(this->socketFd, (sockaddr *)&client, &clientSize);
-			clientClass = new Client(clientFd, getIndexClient(), *this);
+			clientClass = new Client(clientFd, *this);
 			clientClass->sendMessage(welcomeMessage);
 			createFd( clientFd );
 			clients[clientFd] = clientClass;

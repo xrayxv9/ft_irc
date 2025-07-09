@@ -72,7 +72,7 @@ int Kick::execute(const std::string &command, Client *cli) const
 		oss << reason;
 	else
 		oss << target->getNickName();
-	for (std::vector<Client *>::iterator it = channel->getClients().begin(); it != channel->getClients().end(); it++)
+	for (std::vector<Client *>::iterator it = channel->second->getClients().begin(); it != channel->second->getClients().end(); it++)
 		(*it)->sendMessage(oss);
 	channel->second->kick(it);
 	return 1;

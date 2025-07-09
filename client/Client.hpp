@@ -20,7 +20,7 @@ class Channel;
 class Client
 {
 	public:
-		Client( int fd, int index, Server &);
+		Client( int fd, Server &);
 		~Client();
 		Server &getServer();
 		int getFd() const;
