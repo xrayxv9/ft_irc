@@ -33,7 +33,7 @@ int Topic::execute(const std::string &command, Client *cli) const
         cli->sendMessage(oss);
         return 0;
     }
-	if (cli->getChannels()[channelName] == NULL)
+	if (cli->getChannels().find(channelName) == cli->getChannels().end())
     {
         std::ostringstream oss;
         oss << ":ircserv " << 442 << " " << channelName << " :You're not on that channel";

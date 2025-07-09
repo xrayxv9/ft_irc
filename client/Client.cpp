@@ -74,7 +74,6 @@ Channel *Client::joinChannel(const std::string &channelName, const std::string &
 		channel = new Channel(channelName, key);
 		this->_server.getChannels()[channelName] = channel;
 		channel->getModo().push_back(this);
-		std::cout << "create a channel" << std::endl;
 	}
 	else
 	{
@@ -82,9 +81,8 @@ Channel *Client::joinChannel(const std::string &channelName, const std::string &
 		std::cout << std::endl << std::endl <<  "__________________________________" << std::endl << std::endl;
 		if (channel->getMode().find('k') != std::string::npos && key != channel->getPassword())
 		{
-			std::cout << "password : " << channel->getPassword() << " try : " << key << std::endl;
 			oss.clear();
-			oss << "Wrong Password";
+			oss << ":ircserv 475 " << this->getNickName() << " " << channelName << " :Cannot join channel (+k)";
 			sendMessage(oss);
 			return NULL;
 		}
@@ -112,7 +110,6 @@ Channel *Client::joinChannel(const std::string &channelName, const std::string &
 		if (!channel->getPassword().empty() && channel->getPassword() != key)
 			return NULL;
 	}
-
 	oss << ':' << this->generateMask() << " JOIN :" << channelName;
 	this->sendMessage(oss);
 	this->_channels[channelName] = channel;
@@ -179,10 +176,7 @@ int Client::updateQueue()
 		}
 	}
 	else
-	{
-		std::cout << "left" << std::endl;
 		return 1;
-	}
 	return 0;
 }
 

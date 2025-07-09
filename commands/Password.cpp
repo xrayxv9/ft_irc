@@ -1,5 +1,6 @@
 #include "Password.hpp"
 #include "../client/Client.hpp"
+#include <sstream>
 
 Password::Password(): Command("PASS", "Allows you to connect to the server with a password") {}
 
@@ -17,7 +18,9 @@ int Password::execute(const std::string &command, Client *cli) const
 	}
 	if (!command[i] || command[i] == '\r' || command[i] == '\n')
 	{
-		cli->sendMessage("Not enough arguments");
+		std::ostringstream oss;
+	    oss << ":ircserv 461" << this->getName() << " :Not enough parameters";
+        cli->sendMessage(oss);
 		return 0;
 	}
 
@@ -27,11 +30,17 @@ int Password::execute(const std::string &command, Client *cli) const
 	if (passwd == cli->getServer().getPasswd())
 	{
 		std::ostringstream oss;
-
 		cli->sendMessage(oss);
 		cli->logIn();
 		return 1;
 	}
-	cli->sendMessage("Incorrect password");
+	std::ostringstream oss;
+
+	if (!cli->getNickName().empty())
+		oss << cli->getNickName();
+	else
+		oss << "*";
+	oss << " :Password incorrect";
+	cli->sendMessage(oss);
 	return 0;
 }
