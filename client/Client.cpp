@@ -79,13 +79,10 @@ Channel *Client::joinChannel(const std::string &channelName, const std::string &
 	else
 	{
 		channel = this->_server.getChannels()[channelName];
-		std::cout << std::endl << std::endl <<  "__________________________________" << std::endl << std::endl;
-		std::cout << "cond : " << (channel->getMode().find('i') != std::string::npos) << std::endl;
 		if (channel->getMode().find('k') != std::string::npos && key != channel->getPassword())
 		{
-			std::cout << "password : " << channel->getPassword() << " try : " << key << std::endl;
 			oss.clear();
-			oss << "Wrong Password";
+			oss << "475 " << _userName << " " << channelName << " :Cannot join channel (+k)";
 			sendMessage(oss);
 			return NULL;
 		}
@@ -106,7 +103,7 @@ Channel *Client::joinChannel(const std::string &channelName, const std::string &
 			{
 				std::cout << "coucou" << std::endl;
 				oss.clear();
-				oss << "Cannot join channel - you must be invited";
+				oss << ":ircserv 473 " << _userName << " " << channelName << " :Cannot join channel (+i)";
 				sendMessage(oss);
 				return NULL;
 			}
