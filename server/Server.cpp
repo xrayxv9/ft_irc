@@ -150,7 +150,7 @@ void Server::executeCommand()
 				for (int x = 0; (*it)[x] != '\0' && (*it)[x] != ' ' && (*it)[x] != '\r' && (*it)[x] != '\n'; x++)
 					command += (*it)[x];
 				std::cout << "Searching command '" << command << '\'' << std::endl;
-				if (this->commands[command] == NULL && command != "QUIT")
+				if (this->commands.find(command) == this->commands.end() && command != "QUIT")
 				{
 					//Invalid command
 					std::cout << "Invalid command '" << command << '\'' << std::endl;
@@ -171,7 +171,6 @@ void Server::executeCommand()
 				client->getQueue().erase(it);
 				std::cout << "There are now " << client->getQueue().size() << " waiting commands to be executed for " <<client->getUserName() << std::endl;
 				it--;
-				// std::cout << "Reading is: " << command << std::endl;
 				std::cout << "___________________________________________________________" << std::endl;
 			}
 		}

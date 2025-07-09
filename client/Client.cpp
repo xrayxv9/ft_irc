@@ -68,24 +68,21 @@ void Client::sendMessage(std::string str)
 Channel *Client::joinChannel(const std::string &channelName, const std::string &key)
 {
 	std::ostringstream oss;
-	Channel *channel;  
+	Channel *channel = NULL;  
 	if (this->_server.getChannels().find(channelName) == this->_server.getChannels().end())
 	{
 		channel = new Channel(channelName, key);
 		this->_server.getChannels()[channelName] = channel;
 		channel->getModo().push_back(this);
-		std::cout << "create a channel" << std::endl;
 	}
 	else
 	{
 		channel = this->_server.getChannels()[channelName];
 		std::cout << std::endl << std::endl <<  "__________________________________" << std::endl << std::endl;
-		std::cout << "cond : " << (channel->getMode().find('i') != std::string::npos) << std::endl;
 		if (channel->getMode().find('k') != std::string::npos && key != channel->getPassword())
 		{
-			std::cout << "password : " << channel->getPassword() << " try : " << key << std::endl;
 			oss.clear();
-			oss << "Wrong Password";
+			oss << ":ircserv 475 " << this->getNickName() << " " << channelName << " :Cannot join channel (+k)";
 			sendMessage(oss);
 			return NULL;
 		}
@@ -104,17 +101,15 @@ Channel *Client::joinChannel(const std::string &channelName, const std::string &
 			}
 			if (!found)
 			{
-				std::cout << "coucou" << std::endl;
 				oss.clear();
-				oss << "Cannot join channel - you must be invited";
-				sendMessage(oss);
+				oss << ":ircserv 473 " << this->getNickName() << " " << channelName << " :Cannot join channel (+i)";
+				this->sendMessage(oss);
 				return NULL;
 			}
 		}
 		if (!channel->getPassword().empty() && channel->getPassword() != key)
 			return NULL;
 	}
-
 	oss << ':' << this->generateMask() << " JOIN :" << channelName;
 	this->sendMessage(oss);
 	this->_channels[channelName] = channel;
@@ -181,10 +176,7 @@ int Client::updateQueue()
 		}
 	}
 	else
-	{
-		std::cout << "left" << std::endl;
 		return 1;
-	}
 	return 0;
 }
 

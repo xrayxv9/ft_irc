@@ -1,6 +1,7 @@
 #include "Client.hpp"
 #include "Server.hpp"
 #include <PrivMSG.hpp>
+#include <map>
 #include <sstream>
 
 PrivMSG::PrivMSG(): Command("privmsg", "private messages")
@@ -13,9 +14,8 @@ PrivMSG::~PrivMSG()
 
 int PrivMSG::execute(const std::string &command, Client *cli) const
 {
-	std::cout << "----------" << cli->getFd() << "----------" << std::endl << command << std::endl << "---------------------" << std::endl;
-	Channel *channel = cli->getServer().getChannels()[getArg(command, "PRIVMSG ")];
-	if (!channel)
+	std::map<std::string, Channel *>::iterator it = cli->getServer().getChannels().find(getArg(command, "PRIVMSG "));
+	if (it == cli->getServer().getChannels().end())
 	{
 		Client *target = cli->getServer().getClientByString(getArg(command, "PRIVMSG "));
 		if (target == NULL)
@@ -30,6 +30,7 @@ int PrivMSG::execute(const std::string &command, Client *cli) const
 		target->sendMessage(oss);
 		return 1;
 	}
+	Channel *channel = cli->getServer().getChannels()[getArg(command, "PRIVMSG ")];
 	if (!cli->isInChannel(channel))
 	{
 		std::ostringstream oss;
