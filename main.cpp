@@ -34,7 +34,6 @@ std::vector<std::string> split(std::string str, char toSplit)
 	return res;
 }
 
-
 int main(int argc, char **argv)
 {
 	std::string portPreConvert;

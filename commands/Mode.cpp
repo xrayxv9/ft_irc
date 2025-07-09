@@ -8,19 +8,6 @@
 
 Mode::Mode(): Command("MODE", "changes the mode of the current channel") {}
 
-std::string handleOpts(std::string &arg, int &i)
-{
-	std::string opts;
-	for (int x = 0; arg[i] && (std::isalpha(arg[i]) || arg[i] == '+' || arg[i] == '-'); i++, x++)
-	{
-		if (arg[i] == 'a')
-		{
-			opts[x] = arg[i];
-		}
-	}
-	return ("coucou");
-}
-
 int Mode::execute(const std::string &command, Client *cli) const
 {
 	std::string channelName;

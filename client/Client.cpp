@@ -11,11 +11,9 @@ Client::Client( int fd, int index, Server &server):
 	_server(server),
 	_clientFd(fd)
 {
+	(void)index;
 	_isRegistered = false;
 	std::ostringstream oss;
-	std::cout << index << std::endl;
-	oss << index;
-	std::string str = oss.str(); 
 
 	this->_rank = USER;
 }
