@@ -4,7 +4,7 @@
 #include <map>
 #include <sstream>
 
-PrivMSG::PrivMSG(): Command("privmsg", "private messages")
+PrivMSG::PrivMSG(): Command("PRIVMSG", "Send messages in dm or in channels")
 {
 }
 
