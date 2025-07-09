@@ -223,7 +223,7 @@ std::string Server::getPasswd()
 Client *Server::getClientByString(const std::string &toFind)
 {
 	for (std::map<int, Client *>::iterator it = this->clients.begin(); it != this->clients.end(); it++)
-		if (it->second->getUserName() == toFind)
+		if (it->second->getNickName() == toFind)
 			return it->second;
 	return NULL;
 }
