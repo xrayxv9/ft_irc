@@ -56,7 +56,7 @@ int Mode::execute(const std::string &command, Client *cli) const
 		cli->sendMessage("The channel doesn't exist");
 		return 0;
 	}
-	if (!isAdmin && channelNeeded->isRestricted())
+	if (!isAdmin && channelNeeded->isTopicRestricted())
 	{
 		cli->sendMessage("You are not an admin");
 		return 0;
