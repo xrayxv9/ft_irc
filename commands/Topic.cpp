@@ -57,7 +57,7 @@ int Topic::execute(const std::string &command, Client *cli) const
 		cli->sendMessage(oss2);
 		return 1;
 	}
-	if (!cli->isMod(channel))
+	if (channel->isTopicRestricted() && !cli->isMod(channel))
 	{
 		std::ostringstream oss;
 		oss << ":ircserv 482 " << cli->getUserName() << " " << channelName << " :You're not a channel operator";
