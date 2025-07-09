@@ -77,7 +77,7 @@ Channel *Client::joinChannel(const std::string &channelName, const std::string &
 		if (channel->getMode().find('k') != std::string::npos && key != channel->getPassword())
 		{
 			oss.clear();
-			oss << "475 " << _userName << " " << channelName << " :Cannot join channel (+k)";
+			oss << ":ircserv 475 " << _userName << " " << channelName << " :Cannot join channel (+k)";
 			sendMessage(oss);
 			return NULL;
 		}
