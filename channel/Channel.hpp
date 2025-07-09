@@ -31,7 +31,7 @@ class Channel
 
 		// getter
 		bool isInviteOnly();
-		bool isRestricted();
+		bool isTopicRestricted();
 		std::string	getPassword();
 		std::string &getMode();
 		std::vector<Client *> &getClients();
@@ -53,7 +53,7 @@ class Channel
 	private :
 		bool _inviteOnly;
 		int _userLimit;
-		bool _isAdminRestricted;
+		bool _isTopicRestricted;
 		bool _isPasswordLimited;
 		std::string _mode;
 		std::string _channelName;
