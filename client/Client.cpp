@@ -7,15 +7,11 @@
 #include <vector>
 #include <main.hpp>
 
-Client::Client( int fd, int index, Server &server):
+Client::Client( int fd, Server &server):
 	_server(server),
 	_clientFd(fd)
 {
 	_isRegistered = false;
-	std::ostringstream oss;
-	std::cout << index << std::endl;
-	oss << index;
-	std::string str = oss.str(); 
 
 	this->_rank = USER;
 }
@@ -68,13 +64,12 @@ void Client::sendMessage(std::string str)
 Channel *Client::joinChannel(const std::string &channelName, const std::string &key)
 {
 	std::ostringstream oss;
-	Channel *channel;  
+	Channel *channel = NULL;  
 	if (this->_server.getChannels().find(channelName) == this->_server.getChannels().end())
 	{
 		channel = new Channel(channelName, key);
 		this->_server.getChannels()[channelName] = channel;
 		channel->getModo().push_back(this);
-		std::cout << "create a channel" << std::endl;
 	}
 	else
 	{
@@ -101,7 +96,6 @@ Channel *Client::joinChannel(const std::string &channelName, const std::string &
 			}
 			if (!found)
 			{
-				std::cout << "coucou" << std::endl;
 				oss.clear();
 				oss << ":ircserv 473 " << _userName << " " << channelName << " :Cannot join channel (+i)";
 				sendMessage(oss);
@@ -111,7 +105,6 @@ Channel *Client::joinChannel(const std::string &channelName, const std::string &
 		if (!channel->getPassword().empty() && channel->getPassword() != key)
 			return NULL;
 	}
-
 	oss << ':' << this->generateMask() << " JOIN :" << channelName;
 	this->sendMessage(oss);
 	this->_channels[channelName] = channel;
@@ -178,10 +171,7 @@ int Client::updateQueue()
 		}
 	}
 	else
-	{
-		std::cout << "left" << std::endl;
 		return 1;
-	}
 	return 0;
 }
 

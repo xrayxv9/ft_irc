@@ -18,8 +18,6 @@ int User::execute(const std::string &command, Client *cli) const
 	}
 	for (; command[x] && std::isalnum(command[x]); x++)
 		nick += command[x];
-	std::cout << command << std::endl;
-	std::cout << nick << std::endl;
 	if (command[x] != '\r' && !std::isalnum(command[x]) && command[x] != ' ')
 	{
 		std::cerr << cli->getUserName() << ": Erroneus Username" << std::endl;

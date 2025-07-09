@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <channel/Channel.hpp>
 #include <sstream>
+#include <string>
 
 Kick::Kick(): Command("KICK", "kick a user fron a channel")
 {
@@ -65,8 +66,13 @@ int Kick::execute(const std::string &command, Client *cli) const
 		return 0;
 	}
 	std::ostringstream oss;
-	oss << ":" << cli->generateMask() << " KICK " << channelName << " " << target->getUserName();
-	for (std::vector<Client *>::iterator it = channel->second->getClients().begin(); it != channel->second->getClients().end(); it++)
+	oss << ":" << cli->generateMask() << " KICK " << channelName << " " << target->getNickName() << " :";
+	std::string reason = getArg(command, " :", true);
+	if (!reason.empty())
+		oss << reason;
+	else
+		oss << target->getNickName();
+	for (std::vector<Client *>::iterator it = channel->getClients().begin(); it != channel->getClients().end(); it++)
 		(*it)->sendMessage(oss);
 	channel->second->kick(it);
 	return 1;

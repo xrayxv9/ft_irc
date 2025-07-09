@@ -1,9 +1,10 @@
 #include "Client.hpp"
 #include "Server.hpp"
 #include <PrivMSG.hpp>
+#include <map>
 #include <sstream>
 
-PrivMSG::PrivMSG(): Command("privmsg", "private messages")
+PrivMSG::PrivMSG(): Command("PRIVMSG", "Send messages in dm or in channels")
 {
 }
 
@@ -13,7 +14,22 @@ PrivMSG::~PrivMSG()
 
 int PrivMSG::execute(const std::string &command, Client *cli) const
 {
-	std::cout << "----------" << cli->getFd() << "----------" << std::endl << command << std::endl << "---------------------" << std::endl;
+	std::map<std::string, Channel *>::iterator it = cli->getServer().getChannels().find(getArg(command, "PRIVMSG "));
+	if (it == cli->getServer().getChannels().end())
+	{
+		Client *target = cli->getServer().getClientByString(getArg(command, "PRIVMSG "));
+		if (target == NULL)
+		{
+			std::ostringstream oss;
+			oss << getArg(command, "PRIVMSG ") << " :No such nick/channel";
+			cli->sendMessage(oss);
+			return 0;
+		}
+		std::ostringstream oss;
+		oss << ":" << cli->generateMask() << " PRIVMSG " << target->getUserName() << " :" << getArg(command, " :", true),
+		target->sendMessage(oss);
+		return 1;
+	}
 	Channel *channel = cli->getServer().getChannels()[getArg(command, "PRIVMSG ")];
 	if (!cli->isInChannel(channel))
 	{

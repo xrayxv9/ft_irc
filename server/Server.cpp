@@ -20,7 +20,6 @@ Server::Server( int port , std::string passwd )
 	int opt = 1;
 	
 	this->_passwd = passwd;
-	std::cout << this->_passwd << std::endl;
 	// server socket handle
 	this->socketFd = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -145,12 +144,11 @@ void Server::executeCommand()
 			}
 			for (std::vector<std::string>::iterator it = client->getQueue().begin(); it != client->getQueue().end(); it++)
 			{
-				std::cout << "------" << client->getQueue().size() << "------"<< std::endl;
 				command = "";
 				for (int x = 0; (*it)[x] != '\0' && (*it)[x] != ' ' && (*it)[x] != '\r' && (*it)[x] != '\n'; x++)
 					command += (*it)[x];
 				std::cout << "Searching command '" << command << '\'' << std::endl;
-				if (this->commands[command] == NULL && command != "QUIT")
+				if (this->commands.find(command) == this->commands.end() && command != "QUIT")
 				{
 					//Invalid command
 					std::cout << "Invalid command '" << command << '\'' << std::endl;
@@ -159,19 +157,19 @@ void Server::executeCommand()
 				{
 					this->clients.erase(this->clients.find(fd->fd));
 					this->fds.erase(fd);
-					std::cout << "Remaining clients: " << this->clients.size() << std::endl;
 					delete client;
 					fd--;
 					break;
 				}
 				else if (client->isRegistered() || command == "USER" || command == "NICK" || command == "PASS")
+				{
+					std::cout << "Command found !" << std::endl;
 					this->commands[command]->execute(*it, client);
+				}
 				else
 					client->sendMessage("You are not logged in, please use /pass <password>");
 				client->getQueue().erase(it);
-				std::cout << "There are now " << client->getQueue().size() << " waiting commands to be executed for " <<client->getUserName() << std::endl;
 				it--;
-				// std::cout << "Reading is: " << command << std::endl;
 				std::cout << "___________________________________________________________" << std::endl;
 			}
 		}
@@ -184,14 +182,12 @@ void Server::run()
 	sockaddr_in client;
 	socklen_t clientSize = sizeof(client);
 	int clientFd;
-	// char reading[1024];
 	Client *clientClass;
 
 	std::string welcomeMessage = "Welcome to the brand new onlyFans Server";
 	
 	while (g_running)
 	{
-		// std::cout << "Size is " <<  this->clients.size() << std::endl;
 		poll(fds.data(), fds.size(), 10);
 		if (fds.data()->revents & POLLIN)
 		{
@@ -223,7 +219,7 @@ std::string Server::getPasswd()
 Client *Server::getClientByString(const std::string &toFind)
 {
 	for (std::map<int, Client *>::iterator it = this->clients.begin(); it != this->clients.end(); it++)
-		if (it->second->getUserName() == toFind)
+		if (it->second->getNickName() == toFind)
 			return it->second;
 	return NULL;
 }

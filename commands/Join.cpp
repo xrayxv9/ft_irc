@@ -20,15 +20,11 @@ void joinChannel(Client *cli, const std::string &name, const std::string &pass)
 		cli->sendMessage(oss);
 		return ;
 	}
-	std::cout << "Name: " << name << " Password: " << pass << std::endl;
 	Channel *channel = cli->joinChannel(name, pass);
-
-
 	if (channel == NULL)
 	{
 		return ;
 	}
-	std::cout << "coucou je passe ici" << std::endl << std::endl <<std::endl;
 	channel->getClients().push_back(cli);
 }
 
@@ -45,7 +41,7 @@ int Join::execute(const std::string &command, Client *cli) const
 	if (channelsName.empty())
 	{
 		std::ostringstream oss;
-	    oss << cli->getFd() << " " << this->getName() << " :Not enough parameters";
+	    oss << ":ircserv 461" << this->getName() << " :Not enough parameters";
         cli->sendMessage(oss);
         return 0;
     }
