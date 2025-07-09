@@ -68,7 +68,7 @@ void Client::sendMessage(std::string str)
 Channel *Client::joinChannel(const std::string &channelName, const std::string &key)
 {
 	std::ostringstream oss;
-	Channel *channel;  
+	Channel *channel = NULL;  
 	if (this->_server.getChannels().find(channelName) == this->_server.getChannels().end())
 	{
 		channel = new Channel(channelName, key);
