@@ -40,7 +40,7 @@ int Invite::execute(const std::string &command, Client *cli) const
 	Client *target = cli->getServer().getClientByString(user);
 	if (target == NULL)
 		return 0;
-	if (target->getChannels()[channelName] != NULL)
+	if (target->getChannels().find(channelName) != target->getChannels().end())
 	{
 		std::ostringstream oss;
 		oss << target->getNickName() << " " << channelName << " :is already on channel";

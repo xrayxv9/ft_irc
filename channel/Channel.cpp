@@ -50,10 +50,14 @@ std::string Channel::getName()
 
 void Channel::kick(Client *cli)
 {
-	std::vector<Client *>::iterator it = std::find(this->_clientList.begin(), this->_clientList.end() + 2, cli);
+	std::vector<Client *>::iterator it;
+	for (it = _clientList.begin(); (*it)->getFd() != cli->getFd() && it != _clientList.end(); it++) ;
 	if (it == this->_clientList.end())
 		return ;
 	this->_clientList.erase(it);
+	std::map<std::string, Channel *>::iterator clientChannel = cli->getChannels().find(_channelName);
+	if (clientChannel != cli->getChannels().end())
+		cli->getChannels().erase(clientChannel);
 }
 
 const std::string &Channel::getTopic() const
