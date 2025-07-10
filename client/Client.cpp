@@ -106,6 +106,7 @@ Channel *Client::joinChannel(const std::string &channelName, const std::string &
 		if (!channel->getPassword().empty() && channel->getPassword() != key)
 			return NULL;
 	}
+	if (channel->getUserLimit() != -1)
 	{
 		if ((unsigned long)channel->getUserLimit() >= channel->getClients().size())
 		{
