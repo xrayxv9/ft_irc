@@ -15,9 +15,6 @@ Kick::~Kick()
 
 int Kick::execute(const std::string &command, Client *cli) const
 {
-	(void)command;
-	(void)cli;
-	
 	std::string channelName = getArg(command, this->getName() + ' ');
 	std::string user = getArg(command, channelName + ' ');
 	if (channelName.empty() || user.empty())
@@ -74,6 +71,8 @@ int Kick::execute(const std::string &command, Client *cli) const
 		oss << target->getNickName();
 	for (std::vector<Client *>::iterator it = channel->second->getClients().begin(); it != channel->second->getClients().end(); it++)
 		(*it)->sendMessage(oss);
-	channel->second->kick(it);
+	std::cout<< "Before kick " << channel->second->getName() << " " << cli->getChannels().size() << std::endl;
+	channel->second->kick(*it);
+	std::cout<< "After kick " << cli->getChannels().size() << std::endl;
 	return 1;
 }
