@@ -102,6 +102,17 @@ Channel *Client::joinChannel(const std::string &channelName, const std::string &
 				sendMessage(oss);
 				return NULL;
 			}
+			else
+			{
+				for (std::vector<Client *>::iterator it = channel->getInvited().begin(); it != channel->getInvited().end(); it++)
+				{
+					if ((*it)->getFd() == this->getFd())
+					{
+						channel->getInvited().erase(it);
+						break ;
+					}
+				}
+			}
 		}
 		if (!channel->getPassword().empty() && channel->getPassword() != key)
 			return NULL;
