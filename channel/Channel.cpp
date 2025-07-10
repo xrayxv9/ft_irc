@@ -232,12 +232,13 @@ void Channel::setMode( char letter, bool value, Client *cli, std::string options
 	else
 	{
 		bool valid = false;
+		std::cout << "Value negative" << std::endl;
 		for (int i = 0; _mode[i]; i++)
 		{
 			if (_mode[i] == letter)
 			{
 				valid = true;
-				_mode.erase(_mode.find(letter));
+				_mode.erase(_mode.find(letter), 1);
 				break ;
 			}
 		}

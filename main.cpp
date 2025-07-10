@@ -52,12 +52,17 @@ int main(int argc, char **argv)
 		return 1;
 	}
 	port = std::atoi(portPreConvert.c_str());
-	if (port > 65535)
+	if (port > 65535 || port <= 0)
 	{
 		std::cerr << "The port you have given is incorrect" << std::endl;
 		return 1;
 	}
 	std::signal(SIGINT, handle_sigint);
+	if (!argv[2][0])
+	{
+		std::cerr << "Please give a correct password" << std::endl;
+		return 1;
+	}
 	Server *serv = new Server(port, argv[2]);
 	if (serv->getStatus() == 0)
 	{
