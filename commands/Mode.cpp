@@ -60,7 +60,6 @@ int Mode::execute(const std::string &command, Client *cli) const
 		cli->sendMessage(oss);
 		return 0;
 	}
-	std::cout << "it : "<< *it << std::endl;
 	for (int i = 0; (*it)[i] ;i++)
 	{
 		if ((*it)[i] == '+')
@@ -83,7 +82,8 @@ int Mode::execute(const std::string &command, Client *cli) const
 					return 0;
 				num = std::atoi((*(it + iter++)).c_str());
 			}
-			lCommand(num, mode == '+', channelNeeded, cli);
+			if (num > 0)
+				lCommand(num, mode == '+', channelNeeded, cli);
 		}
 		else if ((*it)[i] == 'o')
 		{

@@ -65,6 +65,7 @@ Channel *Client::joinChannel(const std::string &channelName, const std::string &
 {
 	std::ostringstream oss;
 	Channel *channel = NULL;  
+
 	if (this->_server.getChannels().find(channelName) == this->_server.getChannels().end())
 	{
 		channel = new Channel(channelName, key);
@@ -104,6 +105,14 @@ Channel *Client::joinChannel(const std::string &channelName, const std::string &
 		}
 		if (!channel->getPassword().empty() && channel->getPassword() != key)
 			return NULL;
+	}
+	{
+		if ((unsigned long)channel->getUserLimit() >= channel->getClients().size())
+		{
+			oss << ":ircserv 471 " << _userName << " " << channelName << " :Cannot join channel (+l) - channel is full, try again later";
+			sendMessage(oss);
+			return NULL;
+		}
 	}
 	oss << ':' << this->generateMask() << " JOIN :" << channelName;
 	this->sendMessage(oss);

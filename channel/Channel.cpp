@@ -9,6 +9,7 @@
 
 Channel::Channel(std::string channelName, std::string password):
 	_inviteOnly(false),
+	_userLimit(-1),
 	_isTopicRestricted(true),
 	_isPasswordLimited(false),
 	_mode(""),
@@ -199,9 +200,9 @@ void Channel::setUserLimit( bool userLimitBool, int userLimit, Client *cli)
 	oss << userLimit;
 	number = oss.str();
 	if (userLimitBool)
-		_userLimit = -1;
-	else
 		_userLimit = userLimit;		
+	else
+		_userLimit = -1;
 	setMode('l', userLimitBool, cli, number);
 }
 bool findLetter(char c, std::string str)
@@ -219,25 +220,19 @@ void Channel::setMode( char letter, bool value, Client *cli, std::string options
 
 	if (value)
 	{
-		std::cout << "value positive" << std::endl;
 		if (!findLetter(letter, this->_mode) || letter == 'l')
-		{
-			std::cout << "ajout d'une lettre" << std::endl;
 			_mode += letter;
-		}
 		else
 			return ;
 	}
 	else
 	{
 		bool valid = false;
-		std::cout << "Value negative" << std::endl;
 		for (int i = 0; _mode[i]; i++)
 		{
 			if (_mode[i] == letter)
 			{
 				valid = true;
-				std::cout << "retrait d'une lettre " << std::endl;
 				_mode.erase(_mode.find(letter));
 				break ;
 			}
