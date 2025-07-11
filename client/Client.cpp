@@ -154,18 +154,6 @@ std::vector<std::string> &Client::getQueue()
 	return this->_queue;
 }
 
-void print_char_number(std::string str)
-{
-	for (int i = 0; str[i] != '\0'; i++)
-	{
-		std::cout << (int)str[i]; 
-		if (str[i] >= ' ')
-			std::cout << "(" << str[i] << ")";
-		std::cout << " ";
-	}
-	std::cout << std::endl;
-}
-
 int Client::updateQueue()
 {
 	char reading[1024];
@@ -213,3 +201,15 @@ bool Client::isInChannel(Channel *channel) const
 	return false;
 }
 
+void Client::sendUsersList(Channel *channel)
+{
+	for (std::vector<Client *>::iterator it = channel->getClients().begin(); it != channel->getClients().end(); it++)
+	{
+		std::ostringstream oss;
+		oss << ":ircserv 353 " << this->getNickName() << " @ " << channel->getName() << " :" << ((*it)->isMod(channel) ? "@" : "") << (*it)->getNickName();
+		this->sendMessage(oss);
+	}
+	std::ostringstream oss;
+	oss << ":ircserv 366 " << this->getUserName() << " " << channel->getName() << " :End of /NAMES list";
+	this->sendMessage(oss);
+}
