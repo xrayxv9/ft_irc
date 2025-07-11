@@ -2,6 +2,7 @@
 #include "../channel/Channel.hpp"
 #include <map>
 #include <sstream>
+#include <string>
 #include <sys/poll.h>
 #include <sys/socket.h>
 #include <vector>
@@ -144,6 +145,7 @@ std::string Client::getNickName() const
 
 int Client::isRegistered() const
 {
+	std::cout << _isRegistered << " " << !_userName.empty() << " " << !_nickName.empty() << std::endl; 
 	return _isRegistered && !_userName.empty() && !_nickName.empty();
 }
 
@@ -176,25 +178,28 @@ std::vector<std::string> &Client::getQueue()
 int Client::updateQueue()
 {
 	char reading[1024];
-	int result = recv(this->_clientFd, reading, 1024, 0);
+	int result = recv(this->_clientFd, reading, 1023, 0);
 	if (result > 0)
 	{
-		std::vector<std::string> splitted = split(std::string(reading), '\n');
-		for (std::vector<std::string>::iterator it = splitted.begin(); it != splitted.end(); it++)
+		reading[result] = '\0';
+		this->_buff.append(reading);
+
+		std::string::size_type p = this->_buff.find('\n');
+		while (p != std::string::npos)
 		{
-			if ((*it)[(*it).size() - 1] == '\r')
-			{
-				this->_queue.push_back(this->_buff + *it);
-				this->_buff.clear();
-			}
-			else
-				this->_buff = *it;
+			std::string command = this->_buff.substr(0, p);
+			this->_buff.erase(0, p + 1);
+			if (!command.empty() && command[command.length() - 1] == '\r')
+				command[command.length()] = '\0';
+			this->_queue.push_back(command);
+			p = this->_buff.find('\n');
 		}
 	}
 	else
 		return 1;
 	return 0;
 }
+
 
 
 bool Client::isMod(Channel *channel) const
@@ -217,3 +222,15 @@ bool Client::isInChannel(Channel *channel) const
 	return false;
 }
 
+void Client::sendUsersList(Channel *channel)
+{
+	for (std::vector<Client *>::iterator it = channel->getClients().begin(); it != channel->getClients().end(); it++)
+	{
+		std::ostringstream oss;
+		oss << ":ircserv 353 " << this->getNickName() << " @ " << channel->getName() << " :" << ((*it)->isMod(channel) ? "@" : "") << (*it)->getNickName();
+		this->sendMessage(oss);
+	}
+	std::ostringstream oss;
+	oss << ":ircserv 366 " << this->getUserName() << " " << channel->getName() << " :End of /NAMES list";
+	this->sendMessage(oss);
+}

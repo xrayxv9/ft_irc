@@ -39,6 +39,7 @@ class Client
 		int updateQueue();
 		bool isMod(Channel *) const;
 		bool isInChannel(Channel *) const;
+		void sendUsersList(Channel *);
 
 	private:
 		std::map<std::string, Channel *> _channels;
