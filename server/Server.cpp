@@ -157,7 +157,7 @@ void Server::executeCommand()
 					this->commands[command]->execute(*it, client);
 				}
 				else
-					client->sendMessage("You are not logged in, please use /pass <password>");
+					client->sendMessage("You have not finished logging in");
 				client->getQueue().erase(it);
 				it--;
 				std::cout << "___________________________________________________________" << std::endl;

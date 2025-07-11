@@ -6,6 +6,7 @@ Password::Password(): Command("PASS", "Allows you to connect to the server with 
 
 int Password::execute(const std::string &command, Client *cli) const
 {
+	std::ostringstream oss;
 	std::string passwd;
 	int i = 5;
 
@@ -13,12 +14,12 @@ int Password::execute(const std::string &command, Client *cli) const
 
 	if (cli->isRegistered())
 	{
-		cli->sendMessage("You may not register");
+		oss << ":ircserv 462 " << this->getName() << " :You may not register";
+		cli->sendMessage(oss);
 		return 0;
 	}
 	if (!command[i] || command[i] == '\r' || command[i] == '\n')
 	{
-		std::ostringstream oss;
 	    oss << ":ircserv 461" << this->getName() << " :Not enough parameters";
         cli->sendMessage(oss);
 		return 0;
@@ -29,12 +30,9 @@ int Password::execute(const std::string &command, Client *cli) const
 
 	if (passwd == cli->getServer().getPasswd())
 	{
-		std::ostringstream oss;
-		cli->sendMessage(oss);
 		cli->logIn();
 		return 1;
 	}
-	std::ostringstream oss;
 
 	if (!cli->getNickName().empty())
 		oss << cli->getNickName();
