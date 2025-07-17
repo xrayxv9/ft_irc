@@ -13,7 +13,7 @@ int User::execute(const std::string &command, Client *cli) const
 
 	if (!command[x])
 	{
-		std::cerr << cli->getUserName() << ": no nickname given " << std::endl;
+ 		std::cerr << ":ircserv 461 "<< cli->getUserName() << " :no nickname given " << std::endl;
 		return 0;
 	}
 	for (; command[x] && std::isalnum(command[x]); x++)
@@ -32,8 +32,6 @@ int User::execute(const std::string &command, Client *cli) const
 			return 0;
 		}
 	}
-	std::ostringstream oss;
 	cli->setUserName(nick);
-	cli->sendMessage(oss);
 	return 1;
 }
