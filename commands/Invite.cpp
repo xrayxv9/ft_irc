@@ -18,7 +18,7 @@ int Invite::execute(const std::string &command, Client *cli) const
 	if (user.empty() || channelName.empty())
 	{
 		std::ostringstream oss;
-		oss << 461 << " " << this->getName() << " :Not enough parameters";
+		oss << ":ircserv " <<  461 << " " << this->getName() << " :Not enough parameters";
 		cli->sendMessage(oss);
 		return 0;
 	}

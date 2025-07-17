@@ -14,6 +14,12 @@ int Mode::execute(const std::string &command, Client *cli) const
 	std::string options;
 	std::ostringstream oss;
 	std::string arg = getArg(command, "MODE ", true);
+	if (arg.empty())
+	{
+		oss << ":ircserv " <<  461 << " " << this->getName() << " :Not enough parameters";
+		cli->sendMessage(oss);
+		return 1;
+	}
 	std::vector<std::string> args = getAllArgs(arg);
 	std::vector<std::string>::iterator it = args.begin();
 	size_t iter = 1;
