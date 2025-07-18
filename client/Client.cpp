@@ -120,11 +120,11 @@ void Client::joinChannel(const std::string &channelName, const std::string &key)
 	}
 	if (channel->getUserLimit() != -1)
 	{
-		if ((unsigned long)channel->getUserLimit() >= channel->getClients().size())
+		if ((unsigned long)channel->getUserLimit() <= channel->getClients().size())
 		{
 			oss << ":ircserv 471 " << _userName << " " << channelName << " :Cannot join channel (+l) - channel is full, try again later";
 			sendMessage(oss);
-			return NULL;
+			return;
 		}
 	}
 	oss << ':' << this->generateMask() << " JOIN :" << channelName;
