@@ -62,7 +62,7 @@ void Client::sendMessage(std::string str)
 	send(this->_clientFd, str.c_str(), str.length(), 0);
 }
 
-Channel *Client::joinChannel(const std::string &channelName, const std::string &key)
+void Client::joinChannel(const std::string &channelName, const std::string &key)
 {
 	std::ostringstream oss;
 	Channel *channel = NULL;  
@@ -80,7 +80,7 @@ Channel *Client::joinChannel(const std::string &channelName, const std::string &
 			oss.clear();
 			oss << ":ircserv 475 " << _userName << " " << channelName << " :Cannot join channel (+k)";
 			sendMessage(oss);
-			return NULL;
+			return;
 		}
 		if (channel->getMode().find('i') != std::string::npos)
 		{
@@ -100,16 +100,18 @@ Channel *Client::joinChannel(const std::string &channelName, const std::string &
 				oss.clear();
 				oss << ":ircserv 473 " << _userName << " " << channelName << " :Cannot join channel (+i)";
 				sendMessage(oss);
-				return NULL;
+				return;
 			}
 		}
 		if (!channel->getPassword().empty() && channel->getPassword() != key)
-			return NULL;
+			return;
 	}
 	oss << ':' << this->generateMask() << " JOIN :" << channelName;
 	this->sendMessage(oss);
 	this->_channels[channelName] = channel;
-	return channel;
+	channel->getClients().push_back(this);
+	for (std::vector<Client *>::iterator it = channel->getClients().begin() ; it != channel->getClients().end() ; it++)
+		(*it)->sendUsersList(channel);
 }
 
 Server &Client::getServer()
@@ -178,8 +180,6 @@ int Client::updateQueue()
 		return 1;
 	return 0;
 }
-
-
 
 bool Client::isMod(Channel *channel) const
 {
