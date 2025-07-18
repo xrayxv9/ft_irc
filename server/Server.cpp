@@ -4,10 +4,8 @@
 #include "Names.hpp"
 #include "PrivMSG.hpp"
 #include "Mode.hpp"
-#include "Quit.hpp"
 #include "Topic.hpp"
 #include "User.hpp"
-#include "Who.hpp"
 #include <Join.hpp>
 #include <map>
 #include <sys/poll.h>
