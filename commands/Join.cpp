@@ -20,11 +20,7 @@ void joinChannel(Client *cli, const std::string &name, const std::string &pass)
 		cli->sendMessage(oss);
 		return ;
 	}
-	Channel *channel = cli->joinChannel(name, pass);
-	if (channel == NULL)
-		return ;
-	channel->getClients().push_back(cli);
-	cli->sendUsersList(channel);
+	cli->joinChannel(name, pass);
 }
 
 
