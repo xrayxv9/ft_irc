@@ -191,7 +191,9 @@ void Channel::setModo( Client *clientToMod, bool set, Client *cli )
 	else
 	{
 		oss << ":" << cli->generateMask() << " MODE " << _channelName << " " << "-o";
-		_modoList.erase(isModo(clientToMod));
+		std::vector<Client *>::iterator it = isModo(clientToMod);
+		if (it != _modoList.end())
+			_modoList.erase(it);
 	}
 	setMode('o', set, cli, clientToMod->getUserName());
 }
